@@ -25,12 +25,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ======= 💡 API KEYS =======
-GEMINI_KEYS = ["AIzaSyCder4JxE0mPydnIMnfuZXfjIsdRiKZrXw", "AIzaSyA4rWYY6ICBAfCyvbWAOQCLEf60_VvkX7s"]  
-VT_KEYS = ["215cbb7d365ddd13e2f9bf81b205f7e01a592dc4fdb13e1c09408e7d98de9317", "661b52ae0a4b4a95fe17f12829a2ddac5d790e744ea12e061478014e855cf99c"]
+import os
 
-current_gemini_index = 0
-current_vt_index = 0
+# Render nundi keys theeskuni List laaga marchadam
+GEMINI_KEYS = os.getenv("GEMINI_KEYS", "").split(",")
+VT_KEYS = os.getenv("VT_KEYS", "").split(",")
+
+# Okavela Render lo keys pettakapothe, local keys vadela backup (Optional)
+if not GEMINI_KEYS[0]:
+    GEMINI_KEYS = ["YOUR_LOCAL_KEY_1", "YOUR_LOCAL_KEY_2"]
+if not VT_KEYS[0]:
+    VT_KEYS = ["YOUR_LOCAL_VT_KEY_1", "YOUR_LOCAL_VT_KEY_2"]
 
 # ======= 💡 CACHE SYSTEM =======
 scan_cache = {}
