@@ -118,7 +118,7 @@ def check_url_and_ssl(url):
     }
     
     try:
-        response = requests.get(url, headers=headers, timeout=5)
+        response = requests.get(url, headers=headers, timeout=5, verify=False)
         exists = response.status_code < 400
         final_url = response.url 
     except Exception as e:
@@ -158,61 +158,28 @@ def get_location(hostname):
         pass
     return "Location Unknown or Offline"
 
-def get_domain_age(url_or_hostname):
-    import requests
-    import datetime
-    from urllib.parse import urlparse
-    import whois
-
+def get_domain_age(url):
     try:
-        if not url_or_hostname.startswith('http'):
-            url_or_hostname = 'https://' + url_or_hostname
-        parsed = urlparse(url_or_hostname)
-        domain = parsed.hostname or parsed.path
-        if domain.startswith("www."):
+        print(f"🌍 [DEBUG] Fetching Date for: {url}")
+        parsed_url = urlparse(url)
+        domain = parsed_url.hostname
+        if domain.startswith('www.'):
             domain = domain[4:]
-
-        print(f"🌍 [DEBUG] Fetching Date for: {domain}")
-
-        # 💡 THE FIX: Adding Chrome Mask to RDAP API so they don't block us!
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        }
-
-        # METHOD 1: RDAP API (With Mask)
-        try:
-            rdap_url = f"https://rdap.org/domain/{domain}"
-            response = requests.get(rdap_url, headers=headers, timeout=5)
-            if response.status_code == 200:
-                data = response.json()
-                for event in data.get("events", []):
-                    if event.get("eventAction") == "registration":
-                        reg_date_str = event.get("eventDate") 
-                        reg_date = datetime.datetime.strptime(reg_date_str[:10], "%Y-%m-%d")
-                        age = (datetime.datetime.now() - reg_date).days
-                        return f"{reg_date_str[:10]} ({age} days old)"
-        except Exception as e:
-            print(f"⚠️ RDAP blocked/failed: {e}")
-            pass
-
-        # METHOD 2: WHOIS Fallback
-        w = whois.whois(domain)
-        date = w.creation_date
         
-        if date:
-            if isinstance(date, list):
-                date = date[0]
-            if isinstance(date, datetime.datetime):
-                date = date.replace(tzinfo=None) # Timezone Fix
-                age = (datetime.datetime.now() - date).days
-                return f"{date.strftime('%Y-%m-%d')} ({age} days old)"
-            return str(date)
-
+        # Adding timeout and try-except for WHOIS
+        domain_info = whois.whois(domain)
+        creation_date = domain_info.creation_date
+        
+        if type(creation_date) is list:
+            creation_date = creation_date[0]
+            
+        if creation_date:
+            age = (datetime.datetime.now() - creation_date).days
+            return f"{age} days"
+        return "Unknown"
     except Exception as e:
-        print(f"❌ [DOMAIN AGE ERROR] {e}")
-        pass
-        
-    return "Unknown or Hidden by WHOIS Protection"
+        print(f"⚠️ [WHOIS ERROR] Failed to fetch domain age: {e}")
+        return "Unknown (Hidden or Invalid Domain)"
 
 def get_virustotal_report(url):
     global current_vt_index
