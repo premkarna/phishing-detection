@@ -1,4 +1,6 @@
-pandas
-scikit-learn
-joblib
-numpy
+fastapi
+uvicorn
+requests
+python-whois
+google-genai
+pydantic
