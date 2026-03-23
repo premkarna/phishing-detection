@@ -26,16 +26,23 @@ app.add_middleware(
 )
 
 import os
+import uvicorn
+from fastapi import FastAPI
+# ... (మిగతా ఇంపోర్ట్స్ అన్నీ అలాగే ఉంచు) ...
 
-# Render nundi keys theeskuni List laaga marchadam
-GEMINI_KEYS = os.getenv("GEMINI_KEYS", "").split(",")
-VT_KEYS = os.getenv("VT_KEYS", "").split(",")
+# 💡 Render/Cloud Setup
+GEMINI_KEYS_RAW = os.getenv("GEMINI_KEYS", "")
+VT_KEYS_RAW = os.getenv("VT_KEYS", "")
 
-# Okavela Render lo keys pettakapothe, local keys vadela backup (Optional)
-if not GEMINI_KEYS[0]:
-    GEMINI_KEYS = ["YOUR_LOCAL_KEY_1", "YOUR_LOCAL_KEY_2"]
-if not VT_KEYS[0]:
-    VT_KEYS = ["YOUR_LOCAL_VT_KEY_1", "YOUR_LOCAL_VT_KEY_2"]
+# String ని List లాగా మార్చడం
+GEMINI_KEYS = [k.strip() for k in GEMINI_KEYS_RAW.split(",") if k.strip()]
+VT_KEYS = [k.strip() for k in VT_KEYS_RAW.split(",") if k.strip()]
+
+# ఒకవేళ Cloud లో Keys లేకపోతే (Safety Check)
+if not GEMINI_KEYS:
+    GEMINI_KEYS = ["YOUR_BACKUP_KEY_HERE"] 
+if not VT_KEYS:
+    VT_KEYS = ["YOUR_BACKUP_VT_KEY_HERE"]
 
 # ======= 💡 CACHE SYSTEM =======
 scan_cache = {}
