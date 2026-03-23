@@ -43,6 +43,10 @@ else:
     VT_KEYS = ["YOUR_LOCAL_VT_KEY_1", "YOUR_LOCAL_VT_KEY_2"]
     print("🏠 Running in Local Mode with Hardcoded Keys")
 
+    # 💡 THE FIX: Ikkada ee rendu lines add chey Boss! 
+current_vt_index = 0
+current_gemini_index = 0
+
 # ======= 💡 CACHE SYSTEM =======
 scan_cache = {}
 CACHE_EXPIRY_SECONDS = 86400 
