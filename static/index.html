@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Phishing Sentinel Enterprise</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <video autoplay muted loop playsinline id="cyberVideo">
+        <source src="bg-video.mp4" type="video/mp4">
+    </video>
+    <div class="cyber-overlay"></div>
+    
+    <div class="container">
+        <div class="top-metrics">
+            <span>🛡️ DEFENSE SHIELD: <span class="text-safe">ACTIVE</span></span>
+            <span>🌐 API LATENCY: <span style="color:#e3b341">24ms</span></span>
+            <span>🧠 AI ENGINE: <span class="text-safe">GEMINI-PRO</span></span>
+        </div>
+
+        <header>
+            <h1>PHISHING_SENTINEL // <span style="color:var(--accent-color)">V4.0</span></h1>
+            <p class="subtitle">Advanced Neural-Net Threat Detection System</p>
+        </header>
+
+        <main>
+            <div id="uiErrorBox" class="hidden error-container"></div>
+
+            <div class="input-section">
+                <input type="text" id="urlInput" placeholder="Enter target URL (e.g., netflix-billing-update.com)" autofocus>
+                <button id="scanButton">
+                    <span class="btn-text">🚀 INITIATE SCAN</span>
+                    <span class="btn-loader hidden">⏳ AUDITING...</span>
+                </button>
+            </div>
+
+            <div id="historySection" class="history-box hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h4 style="margin: 0;">🕒 RECENT TARGETS</h4>
+                    <button id="clearHistoryBtn" style="background: transparent; border: 1px solid #f85149; color: #f85149; padding: 4px 10px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; font-family: var(--font-cyber);">[ CLEAR ALL ]</button>
+                </div>
+                <ul id="historyList"></ul>
+            </div>
+
+            <div id="infoGridSection" class="security-info-grid">
+                <div class="info-card">
+                    <h3>⚡ MULTI-VECTOR ANALYSIS</h3>
+                    <p>Scans Deep-Web intel, checks SSL/TLS handshakes, and traces physical IP geolocation to verify server legitimacy.</p>
+                </div>
+                <div class="info-card">
+                    <h3>🧠 AI HEURISTICS</h3>
+                    <p>Detects zero-day typosquatting and behavioral anomalies that bypass traditional signature-based antiviruses.</p>
+                </div>
+            </div>
+
+            <div id="loadingSection" class="result-section hidden center-text">
+                <div class="cyber-loader"><span>]</span><span>[</span><span>]</span><span>[</span></div>
+                <p class="loading-text">Bypassing Firewalls... Querying Global Threat Database... Analyzing DOM...</p>
+            </div>
+
+            <div id="resultSection" class="result-section hidden">
+                <div class="report-header">
+                    <h2>📊 THREAT INTELLIGENCE REPORT</h2>
+                    <span class="timestamp" id="scanTime"></span>
+                </div>
+                
+                <div class="risk-meter-container">
+                    <div class="risk-labels">
+                        <span>SAFE</span>
+                        <span>SUSPICIOUS</span>
+                        <span>CRITICAL</span>
+                    </div>
+                    <div class="risk-bar-bg">
+                        <div id="riskBarFill" class="risk-bar-fill"></div>
+                    </div>
+                </div>
+
+                <div id="verdictBox" class="verdict-box">
+                    <span class="label">FINAL_VERDICT:</span> <span id="reportVerdict"></span>
+                </div>
+
+                <div class="data-grid">
+                    <div class="data-item"><span class="label">TARGET_URL</span><span id="reportUrl" class="value highlight"></span></div>
+                    <div class="data-item"><span class="label">SITE_STATUS</span><span id="reportExists" class="value"></span></div>
+                    <div class="data-item"><span class="label">SERVER_LOC</span><span id="reportLocation" class="value"></span></div>
+                    <div class="data-item"><span class="label">VIRUS_TOTAL</span><span id="reportVt" class="value"></span></div>
+                    <div class="data-item"><span class="label">DOMAIN_AGE</span><span id="reportAge" class="value"></span></div>
+                    <div class="data-item"><span class="label">SSL_CERT</span><span id="reportSsl" class="value"></span></div>
+                </div>
+
+                <div id="reasonsBox" class="reasons-box">
+                    <p class="label" style="color:var(--accent-color); margin-bottom:10px;">>_ GEMINI AI TERMINAL OUTPUT:</p>
+                    <div id="reportReasons"></div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="resetButton" class="reset-btn"><span>🔁 NEW TARGET</span></button>
+                    <button id="downloadButton" class="download-btn"><span>📥 EXPORT EXECUTIVE REPORT</span></button>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
