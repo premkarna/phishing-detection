@@ -1,32 +1,53 @@
-# 🛡️ AI Phishing Sentinel V4.0 Enterprise
+# 🛡️ PHISHING SENTINEL | Enterprise Threat Intelligence
+> **Advanced Neural-Net & Heuristic-Based Phishing Detection System**
 
-![Status](https://img.shields.io/badge/Status-Active-success)
-![Version](https://img.shields.io/badge/Version-4.0_Enterprise-blue)
-![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
-![AI](https://img.shields.io/badge/AI_Engine-Gemini_Pro-orange)
+[![Python](https://img.shields.io/badge/Python-3.9+-blue?logo=python)](https://www.python.org/)
+[![Framework](https://img.shields.io/badge/Framework-FastAPI-green?logo=fastapi)](https://fastapi.tiangolo.com/)
+[![AI Engine](https://img.shields.io/badge/AI-Gemini--Pro-red?logo=google-gemini)](https://ai.google.dev/)
+[![Security](https://img.shields.io/badge/Security-WAF--Bypass-orange?logo=security)](#)
 
-An advanced, real-time threat intelligence platform designed to detect zero-day phishing attacks, typosquatting, and homograph vulnerabilities using multi-vector analysis and Neural-Net heuristics.
+---
 
-## 🚀 Key Features
+## 🚀 Overview
+**Phishing Sentinel** is a state-of-the-art cybersecurity tool designed to dismantle malicious URLs. It doesn't just check a database; it performs **Live Heuristic Analysis**, **Domain Forensics**, and uses **Gemini AI** to provide a human-readable threat verdict.
 
-* **🧠 AI-Powered Threat Heuristics:** Utilizes Google Gemini AI to analyze URL structures and detect sophisticated Typosquatting (e.g., `instagrarn` vs `instagram`) and Punycode attacks.
-* **🕵️ Stealth Mode (Anti-Bot Bypass):** Implements User-Agent spoofing to bypass anti-bot mechanisms on major platforms (like PayPal, Netflix) to accurately retrieve SSL and server statuses.
-* **🌐 Deep-Web Telemetry:** Cross-references URLs with the VirusTotal API database for global threat consensus.
-* **🔍 Advanced Domain Intel:** Uses modern RDAP APIs with a classic WHOIS fallback (with strict timezone handling) to determine exact domain age and registration anomalies.
-* **🔒 SSL/TLS Validation:** Performs real-time socket connections to verify SSL certificate issuers and expiry dates.
-* **⚡ In-Memory Caching:** Built-in 24-hour result caching system to optimize API limits and provide lightning-fast (<0.1s) responses for repeated targets.
-* **📊 Executive Reporting:** Generates downloadable, print-ready HTML Threat Intelligence Reports suitable for SOC (Security Operations Center) analysts.
 
-## 💻 System Architecture & Tech Stack
 
-* **Backend Engine:** Python, FastAPI, Uvicorn
-* **Threat Intel APIs:** Google Gemini API, VirusTotal v3 API, IP-API, RDAP Protocol
-* **Frontend UI:** HTML5, CSS3 (Advanced Glassmorphism & HUD Design), Vanilla JavaScript
-* **Security Libraries:** `ssl`, `socket`, `python-whois`, `urllib`
+---
+
+## ✨ Key Features (The "Superpowers")
+
+### 🧬 Multi-Vector Threat Intelligence
+* **Domain Forensics:** Calculates exact **Domain Age** (Creation Date) to identify "Burner Domains".
+* **SSL/TLS Audit:** Verifies certificate validity and Issuer (Let's Encrypt vs. Reputable CAs).
+* **IP Geolocation:** Live tracking of the server's physical location and ISP.
+* **Brand Spoofing (Typosquatting):** Detects sneaky character replacements (e.g., `instagrarn.com` vs `instagram.com`).
+
+### 🤖 AI-Powered Analysis
+* **Gemini AI Specialist:** Performs a deep-dive analysis of all gathered data points.
+* **Typewriter UI:** Results are delivered via a hacker-style real-time typewriter effect.
+* **Actionable Advice:** Provides specific "Stay Safe" instructions based on the threat level.
+
+### 🕵️‍♂️ Advanced Bypassing & Cloaking
+* **Chrome Masking:** Uses custom headers to bypass Web Application Firewalls (WAF).
+* **Stealth Preview:** Generates a **Safe Visual Preview** of the site without exposing the user.
+* **Matrix Radar Scan:** An immersive, full-screen blur-overlay animation during the "Scanning" phase.
+
+---
+
+## 🛠️ Technical Stack
+* **Backend:** Python 3.x, FastAPI
+* **Frontend:** Modern HTML5, Cyber-Grid CSS, Vanilla JS
+* **APIs Integrated:** Google Gemini AI, VirusTotal v3, URLHaus, IP-API
+* **Stealth Tools:** Cloudscraper / Custom User-Agent Rotation
+
+
+
+---
 
 ## ⚙️ Installation & Setup
 
-1. **Clone the repository:**
+1. **Clone the Fortress:**
    ```bash
-   git clone [https://github.com/premkarna/AI-Phishing-Sentinel.git](https://github.com/premkarna/AI-Phishing-Sentinel.git)
-   cd AI-Phishing-Sentinel
+   git clone [https://github.com/premkarna/Phishing-Sentinel.git](https://github.com/premkarna/Phishing-Sentinel.git)
+   cd Phishing-Sentinel

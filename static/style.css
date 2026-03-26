@@ -1,95 +1,322 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600;700&family=Share+Tech+Mono&display=swap');
-
 :root {
-    --bg-color: #010409; 
-    --card-color: rgba(10, 13, 18, 0.75); 
-    --border-color: rgba(48, 54, 61, 0.8);
-    --text-primary: #e6edf3;
-    --text-secondary: #8b949e;
-    --accent-color: #58a6ff; 
-    --accent-glow: rgba(88, 166, 255, 0.5);
-    --safe-color: #3fb950;
-    --danger-color: #f85149;
-    --font-mono: 'Roboto Mono', monospace;
-    --font-cyber: 'Share Tech Mono', monospace;
+    --bg-main: #0b0f19;
+    --bg-card: #151b2b;
+    --border-color: #2a3441;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+    --accent-cyan: #00f0ff;
+    --safe-green: #10b981;
+    --warn-yellow: #f59e0b;
+    --crit-red: #ef4444;
 }
 
-body { margin: 0; padding: 0; font-family: var(--font-mono); background-color: var(--bg-color); color: var(--text-primary); min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow-x: hidden; font-size: 14px; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-#cyberVideo { position: fixed; top: 0; left: 0; min-width: 100%; min-height: 100%; z-index: -2; object-fit: cover; filter: brightness(0.4); }
-.cyber-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: repeating-linear-gradient(rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px); opacity: 0.6; }
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
 
-.container { width: 95%; max-width: 950px; margin: 2rem auto; opacity: 0.8;
-     padding: 2.5rem; background-color: var(--card-color); border: 1px solid var(--border-color);
-      box-shadow: 0 0 50px rgba(0,0,0,0.9); border-radius: 12px; backdrop-filter: blur(25px); z-index: 10; position: relative; }
+/* Subtle Cyber Grid Background */
+.cyber-grid-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+    background-image: linear-gradient(rgba(42, 52, 65, 0.3) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(42, 52, 65, 0.3) 1px, transparent 1px);
+    background-size: 30px 30px;
+    opacity: 0.4;
+}
 
-/* 💡 TOP METRICS BAR */
-.top-metrics { display: flex; justify-content: space-between; font-size: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; font-weight: bold; letter-spacing: 1px; }
-.text-safe { color: var(--safe-color); }
+.container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
 
-header { text-align: center; margin-bottom: 2rem; }
-h1 { font-family: var(--font-cyber); margin: 5px 0; text-transform: uppercase; font-size: 2.2rem; text-shadow: 0 0 10px var(--accent-glow); letter-spacing: 2px;}
-.subtitle { color: var(--text-secondary); font-size: 0.95rem; }
+header {
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1.5rem; margin-bottom: 3rem;
+}
 
-.input-section { display: flex; gap: 15px; margin-bottom: 25px; }
-input { flex-grow: 1; background: rgba(0, 0, 0, 0.6); border: 1px solid var(--border-color); padding: 15px; color: var(--accent-color); border-radius: 6px; font-size: 1.1rem; font-family: var(--font-mono); }
-input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 15px var(--accent-glow); }
-button#scanButton { background: linear-gradient(135deg, #1f6feb, #58a6ff); color: #000; border: none; padding: 0 30px; border-radius: 6px; cursor: pointer; font-family: var(--font-cyber); font-weight: bold; font-size: 1rem; text-transform: uppercase; transition: 0.3s; }
-button#scanButton:hover { box-shadow: 0 0 20px var(--accent-glow); transform: scale(1.02); }
+.logo h1 { font-size: 1.5rem; letter-spacing: 2px; }
+.logo span { color: var(--accent-cyan); }
+.status-badge { display: flex; align-items: center; gap: 8px; font-family: 'Fira Code', monospace; font-size: 0.9rem; color: var(--safe-green); }
+.dot { width: 8px; height: 8px; background: var(--safe-green); border-radius: 50%; }
+.pulse { box-shadow: 0 0 10px var(--safe-green); animation: pulse 2s infinite; }
 
-/* HISTORY */
-.history-box { margin-bottom: 25px; background: rgba(0, 0, 0, 0.5); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);}
-.history-box h4 { margin: 0 0 12px 0; color: #fff; font-size: 0.85rem; }
-#historyList { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 10px; }
-.history-item { background: rgba(88, 166, 255, 0.1); color: #c9d1d9; border: 1px solid rgba(88, 166, 255, 0.3); padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-weight: 600;}
-.history-item:hover { background: rgba(88, 166, 255, 0.3); color: #fff; border-color: var(--accent-color); }
-.history-item::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
-.history-safe::before { background-color: var(--safe-color); box-shadow: 0 0 8px var(--safe-color); }
-.history-phishing::before { background-color: var(--danger-color); box-shadow: 0 0 8px var(--danger-color); }
+.search-section { text-align: center; margin-bottom: 3rem; }
+.subtitle { color: var(--text-muted); font-family: 'Fira Code', monospace; margin-bottom: 2rem; }
 
-/* INFO CARDS */
-.security-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.info-card { background: rgba(0, 0, 0, 0.4); border-top: 3px solid var(--accent-color); padding: 20px; border-radius: 6px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
-.info-card h3 { font-family: var(--font-cyber); color: var(--accent-color); margin: 0 0 10px 0; font-size: 1.1rem; }
-.info-card p { font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary); margin: 0; }
+.search-box {
+    display: flex; max-width: 800px; margin: 0 auto;
+    background: var(--bg-card); border: 1px solid var(--accent-cyan);
+    border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
+}
 
-/* RESULTS SECTION */
-.result-section { border: 1px solid var(--border-color); padding: 30px; border-radius: 8px; background: rgba(0, 0, 0, 0.6); margin-top: 25px; box-shadow: inset 0 0 30px rgba(0,0,0,0.5); }
-.report-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
-.report-header h2 { font-size: 1.4rem; margin: 0; font-family: var(--font-cyber); }
-.timestamp { font-size: 0.8rem; color: var(--text-secondary); }
+.search-box input {
+    flex: 1; background: transparent; border: none; padding: 1.2rem;
+    color: white; font-size: 1.1rem; font-family: 'Fira Code', monospace; outline: none;
+}
 
-/* 💡 RISK METER */
-.risk-meter-container { margin-bottom: 25px; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 6px; border: 1px solid var(--border-color); }
-.risk-labels { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: bold; margin-bottom: 8px; color: var(--text-secondary); }
-.risk-bar-bg { width: 100%; height: 12px; background: #21262d; border-radius: 10px; overflow: hidden; }
-.risk-bar-fill { height: 100%; width: 0%; transition: width 1.5s ease-out, background-color 1.5s ease-out; }
+.search-box button {
+    background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan);
+    border: none; border-left: 1px solid var(--accent-cyan);
+    padding: 0 2rem; font-weight: bold; cursor: pointer; transition: 0.3s;
+}
 
-/* DATA GRID */
-.data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-.data-item { background: rgba(255,255,255,0.03); padding: 12px 15px; border-radius: 6px; border-left: 2px solid var(--border-color); display: flex; flex-direction: column; gap: 5px; }
-.data-item .label { font-size: 0.75rem; color: var(--text-secondary); font-weight: bold; text-transform: uppercase; }
-.data-item .value { font-size: 0.95rem; font-weight: 600; word-break: break-all; }
-.value.highlight { color: var(--accent-color); }
-
-.verdict-box { margin: 0 0 25px 0; padding: 20px; border: 2px solid var(--border-color); font-size: 1.8rem; text-align: center; font-family: var(--font-cyber); background-color: rgba(0,0,0,0.7); border-radius: 8px; letter-spacing: 2px; font-weight: bold;}
-.reasons-box { background: #0d1117; padding: 20px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 0.9rem; line-height: 1.6; }
-
-/* BUTTONS */
-.action-buttons { display: flex; gap: 15px; margin-top: 25px; }
-.action-buttons button { cursor: pointer; font-family: var(--font-cyber); transition: 0.3s; flex-grow: 1; padding: 15px; border-radius: 6px; font-weight: bold; font-size: 1rem; border: none; letter-spacing: 1px; }
-.reset-btn { background: #21262d; color: var(--text-primary); border: 1px solid var(--border-color) !important; }
-.reset-btn:hover { background: #30363d; }
-.download-btn { background: rgba(88, 166, 255, 0.1); border: 1px solid var(--accent-color) !important; color: var(--accent-color); }
-.download-btn:hover { background: var(--accent-color); color: #000; box-shadow: 0 0 15px var(--accent-glow); }
-
-/* THEMES */
-.phishing-state .verdict-box { border-color: var(--danger-color); color: var(--danger-color); background: rgba(248, 81, 73, 0.1); box-shadow: 0 0 20px rgba(248,81,73,0.2); }
-.safe-state .verdict-box { border-color: var(--safe-color); color: var(--safe-color); background: rgba(63, 185, 80, 0.1); box-shadow: 0 0 20px rgba(63,185,80,0.2); }
-.error-container { background: rgba(248,81,73,0.1); border: 1px solid #f85149; color: #f85149; padding: 15px; margin-bottom: 20px; text-align: center; border-radius: 6px; font-weight: bold; }
+.search-box button:hover { background: var(--accent-cyan); color: #000; }
 
 .hidden { display: none !important; }
-.center-text { text-align: center; padding: 40px 0; }
-.cyber-loader { font-size: 2rem; color: var(--accent-color); margin-bottom: 15px; letter-spacing: 5px; animation: pulse 1s infinite; }
-.loading-text { color: var(--text-secondary); font-family: var(--font-cyber); font-size: 1.1rem; }
-@keyframes pulse { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
+
+/* Dashboard Styles */
+.verdict-banner {
+    text-align: center; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;
+    border: 2px solid; text-transform: uppercase; letter-spacing: 2px;
+}
+.verdict-banner.safe { border-color: var(--safe-green); color: var(--safe-green); background: rgba(16, 185, 129, 0.1); }
+.verdict-banner.suspicious { border-color: var(--warn-yellow); color: var(--warn-yellow); background: rgba(245, 158, 11, 0.1); }
+.verdict-banner.critical { border-color: var(--crit-red); color: var(--crit-red); background: rgba(239, 68, 68, 0.1); }
+
+.data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+.bottom-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+
+.card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; }
+.card h3 { margin-bottom: 1.5rem; color: var(--text-muted); font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
+
+.data-row { display: flex; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem; }
+.label { color: var(--text-muted); width: 140px; font-weight: 600; }
+.value { color: var(--text-main); font-family: 'Fira Code', monospace; flex: 1; word-break: break-all; }
+
+/* AI Terminal */
+.ai-terminal { border-color: #333; }
+.terminal-header { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; font-family: 'Fira Code'; font-size: 0.8rem; color: #888; }
+.dots span { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #444; margin-right: 4px; }
+.dots span:nth-child(1) { background: #ff5f56; } .dots span:nth-child(2) { background: #ffbd2e; } .dots span:nth-child(3) { background: #27c93f; }
+.terminal-body { font-family: 'Fira Code', monospace; font-size: 0.95rem; line-height: 1.6; color: #a5d6ff; white-space: pre-wrap; }
+
+/* Image Preview */
+.img-container { width: 100%; height: 200px; background: #000; border: 1px dashed var(--border-color); display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; }
+.img-container img { width: 100%; height: 100%; object-fit: cover; }
+#preview-placeholder { color: var(--text-muted); font-size: 0.9rem; }
+
+.actions { text-align: center; }
+.btn-secondary { background: transparent; color: var(--text-main); border: 1px solid var(--border-color); padding: 10px 20px; border-radius: 4px; cursor: pointer; font-family: 'Fira Code'; transition: 0.3s; }
+.btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+
+/* --- THE CYBER-SOC UI UPGRADE --- */
+
+/* Glassmorphism for Data Cards */
+.data-card, .ai-output-box, .preview-box {
+    background: rgba(16, 20, 30, 0.7) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 255, 136, 0.2) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.data-card:hover, .ai-output-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px 0 rgba(0, 255, 136, 0.15);
+    border: 1px solid rgba(0, 255, 136, 0.5) !important;
+}
+
+/* Glowing text for Final Verdicts */
+#final-verdict-text {
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.verdict-safe { 
+    color: #00ff88; 
+    text-shadow: 0 0 15px rgba(0,255,136,0.6); 
+}
+
+.verdict-critical { 
+    color: #ff3366; 
+    text-shadow: 0 0 15px rgba(255,51,102,0.6); 
+}
+
+/* Hacker-style input bar */
+input[type="text"] {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    border: 1px solid #00ff88 !important;
+    color: #00ff88 !important;
+    font-family: 'Courier New', Courier, monospace;
+    letter-spacing: 1px;
+}
+
+input[type="text"]:focus {
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+}
+
+/* --- IMAGE ZOOM MODAL STYLES --- */
+#res-preview {
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#res-preview:hover {
+    opacity: 0.7;
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+}
+
+/* The Modal (background) */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 9999; 
+    padding-top: 80px; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0, 0, 0, 0.85); 
+    backdrop-filter: blur(5px);
+}
+
+/* Modal Content (Image) */
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 900px;
+    border: 2px solid #00ff88;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+    animation: zoom 0.4s ease-in-out;
+}
+
+@keyframes zoom {
+    from {transform: scale(0.5); opacity: 0;} 
+    to {transform: scale(1); opacity: 1;}
+}
+
+/* The Close Button */
+.close-modal {
+    position: absolute;
+    top: 30px;
+    right: 50px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+    color: #00ff88;
+}
+
+/* =======================================================
+   🚀 ENTERPRISE SOC UI UPGRADES (THE "GOD-TIER" LOOK)
+   ======================================================= */
+
+/* 1. Cyberpunk Matrix Scrollbar (Goodbye boring white scrollbars!) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #0b101a; 
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 136, 0.5); 
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 136, 1); 
+    box-shadow: 0 0 10px #00ff88;
+}
+
+/* --- Level 2: Staggered Revelation (Entrance Animation) --- */
+
+/* Base animation rules (shared by all cards) */
+.data-card, .ai-output-box, .preview-box {
+    opacity: 0;
+    animation: slideUpFade SOC_Revealer cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes SOC_Revealer {
+    0% { opacity: 0; transform: translateY(50px) scale(0.9); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Set different delays based on order of HTML (Staggered look) */
+.data-card:nth-of-type(1) { animation-duration: 0.8s; animation-delay: 0.1s; } /* Domain Age usually */
+.preview-box { animation-duration: 0.8s; animation-delay: 0.25s; } /* Image Box */
+.data-card:nth-of-type(2) { animation-duration: 0.8s; animation-delay: 0.4s; } /* SSL/VT usually */
+.data-card:nth-of-type(3) { animation-duration: 0.8s; animation-delay: 0.55s; } /* URLHaus */
+.ai-output-box { animation-duration: 1.0s; animation-delay: 0.7s; } /* AI Box (Last & Main) */
+
+@keyframes slideUpFade {
+    0% { opacity: 0; transform: translateY(40px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* 3. Glowing Radar Scan Button */
+button, .scan-button, input[type="submit"], #scan-btn {
+    transition: all 0.3s ease-in-out;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    position: relative;
+    overflow: hidden;
+}
+button:hover, .scan-button:hover, #scan-btn:hover {
+    box-shadow: 0 0 25px rgba(0, 255, 136, 0.8);
+    transform: translateY(-3px) scale(1.02);
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+/* 4. Hacker Input Field Focus Glow */
+input[type="text"] {
+    transition: all 0.3s ease;
+}
+input[type="text"]:focus {
+    outline: none;
+    box-shadow: inset 0 0 10px rgba(0, 255, 136, 0.2), 0 0 20px rgba(0, 255, 136, 0.6);
+    border: 1px solid #00ff88 !important;
+    background-color: rgba(0, 255, 136, 0.05) !important;
+}
+
+/* --- Level 1: Matrix Scan Overlay Styles --- */
+.scan-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(10, 15, 25, 0.95);
+    z-index: 9998;
+    display: none; /* Controlled by JS */
+    flex-direction: column; justify-content: center; align-items: center;
+    backdrop-filter: blur(8px);
+}
+
+.radar {
+    width: 200px; height: 200px; border-radius: 50%;
+    border: 3px solid rgba(0, 255, 136, 0.4);
+    box-shadow: 0 0 50px rgba(0, 255, 136, 0.2), inset 0 0 50px rgba(0, 255, 136, 0.2);
+    position: relative;
+    animation: pulseRadar 2s infinite;
+}
+
+.radar-line {
+    position: absolute; width: 100px; height: 3px;
+    background: linear-gradient(90deg, transparent, #00ff88);
+    box-shadow: 0 0 15px #00ff88;
+    top: 50%; left: 50%;
+    transform-origin: left center;
+    animation: rotateRadar 1.5s linear infinite;
+}
+
+.hacker-loader-text {
+    font-family: 'Courier New', monospace; color: #00ff88;
+    margin-top: 30px; letter-spacing: 3px; font-weight: bold;
+    text-shadow: 0 0 10px #00ff88;
+    animation: textFlicker 1.5s infinite;
+}
+
+@keyframes rotateRadar { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes pulseRadar { 0% { transform: scale(1); opacity: 0.8;} 50% { transform: scale(1.05); opacity: 1;} 100% { transform: scale(1); opacity: 0.8;} }
+@keyframes textFlicker { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
