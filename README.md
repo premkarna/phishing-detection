@@ -45,6 +45,22 @@
 
 ---
 
+## 🤝 Community & Collaboration
+**Phishing Sentinel** is an open-source project and we welcome contributions from cybersecurity enthusiasts and developers worldwide! 
+
+### 🌟 How to Contribute:
+1. **Check Open Issues:** Visit our [Issues Tab](https://github.com/premkarna/Phishing-Sentinel/issues) to find a task you'd like to work on.
+2. **Follow Guidelines:** Read our [Contributing Guide](CONTRIBUTING.md) for the workflow.
+3. **Join the Mission:** Whether it's fixing a bug, adding a new feature (like SMS Phishing detection), or improving documentation, your help is appreciated!
+
+### 🎯 Project Roadmap:
+- [ ] **Smishing Module:** SMS-based phishing link analysis.
+- [ ] **Quishing Module:** QR Code image decoding and URL scanning.
+- [ ] **Dark Mode:** User-toggleable UI themes.
+- [ ] **Multi-lingual AI:** Verdicts in Telugu, Hindi, and more.
+
+---
+
 ## ⚙️ Installation & Setup
 
 1. **Clone the Fortress:**
