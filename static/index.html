@@ -4,13 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Phishing Sentinel | Enterprise</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;600;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="dark">
     <div class="cyber-grid-bg"></div>
 
     <div class="container">
@@ -19,9 +16,19 @@
           <span class="icon">🛡️</span>
           <h1>PHISHING_<span>SENTINEL</span></h1>
         </div>
-        <div class="status-badge">
-          <span class="dot pulse"></span> ENGINE ACTIVE
-        </div>
+        <div class="header-actions">
+                <div class="status-badge">
+                    <span class="dot pulse"></span> ENGINE ACTIVE
+                </div>
+                <div class="theme-toggle" role="group" aria-label="Theme toggle">
+                    <span class="theme-label dark-label">DARK</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="theme-toggle" aria-label="Toggle light mode">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="theme-label light-label">LIGHT</span>
+                </div>
+            </div>
       </header>
 
       <section class="search-section">
@@ -130,17 +137,6 @@
                 document.getElementById('zoomedImage').src = this.src;
               "
             />
-
-            <div id="imageModal" class="modal">
-              <span
-                class="close-modal"
-                onclick="
-                  document.getElementById('imageModal').style.display = 'none'
-                "
-                >&times;</span
-              >
-              <img class="modal-content" id="zoomedImage" />
-            </div>
           </div>
         </div>
 
@@ -165,5 +161,5 @@
       </div>
       <p class="hacker-loader-text">SEARCHING FOR THREATS...</p>
     </div>
-  </body>
+</body>
 </html>
