@@ -105,26 +105,48 @@ document.addEventListener("DOMContentLoaded", function() {
     const img = document.getElementById("res-preview");
     const modalImg = document.getElementById("zoomedImage");
     const closeBtn = document.getElementsByClassName("close-modal")[0];
+    const themeToggle = document.getElementById("theme-toggle");
 
-    // Click on image to open modal
-    img.onclick = function() {
-        // Prevent zooming if the image is still the loading spinner
-        if (this.src && !this.src.includes('spinner') && !this.src.includes('loading')) {
-            modal.style.display = "block";
-            modalImg.src = this.src;
+    if (modal && img && modalImg && closeBtn) {
+        // Click on image to open modal
+        img.onclick = function() {
+            // Prevent zooming if the image is still the loading spinner
+            if (this.src && !this.src.includes('spinner') && !this.src.includes('loading')) {
+                modal.style.display = "block";
+                modalImg.src = this.src;
+            }
         }
-    }
 
-    // Click on 'X' to close
-    closeBtn.onclick = function() {
-        modal.style.display = "none";
-    }
-
-    // Click anywhere outside the image to close
-    modal.onclick = function(event) {
-        if (event.target !== modalImg) {
+        // Click on 'X' to close
+        closeBtn.onclick = function() {
             modal.style.display = "none";
         }
+
+        // Click anywhere outside the image to close
+        modal.onclick = function(event) {
+            if (event.target !== modalImg) {
+                modal.style.display = "none";
+            }
+        }
+    }
+
+    if (themeToggle) {
+        const storedTheme = localStorage.getItem("sentinel-theme");
+        const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+        const initialTheme = storedTheme || (prefersLight ? "light" : "dark");
+
+        const setTheme = (theme) => {
+            document.body.setAttribute("data-theme", theme);
+            themeToggle.checked = theme === "light";
+        };
+
+        setTheme(initialTheme);
+
+        themeToggle.addEventListener("change", () => {
+            const nextTheme = themeToggle.checked ? "light" : "dark";
+            setTheme(nextTheme);
+            localStorage.setItem("sentinel-theme", nextTheme);
+        });
     }
 });
 
@@ -151,7 +173,7 @@ function typeWriter(elementId, text, speed = 25) {
             // Add bullet symbol and prepare list item
             const listItem = document.createElement("p");
             listItem.style.marginBottom = "8px"; // Spacing
-            listItem.innerHTML = "<span style='color:#00ff88; font-weight:bold;'>»</span> "; // Bullet symbol
+            listItem.innerHTML = "<span class='ai-bullet'>»</span> "; // Bullet symbol
             element.appendChild(listItem);
             
             let charIndex = 0;

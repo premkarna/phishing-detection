@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-theme="dark">
     <div class="cyber-grid-bg"></div>
     
     <div class="container">
@@ -16,8 +16,18 @@
                 <span class="icon">🛡️</span>
                 <h1>PHISHING_<span>SENTINEL</span></h1>
             </div>
-            <div class="status-badge">
-                <span class="dot pulse"></span> ENGINE ACTIVE
+            <div class="header-actions">
+                <div class="status-badge">
+                    <span class="dot pulse"></span> ENGINE ACTIVE
+                </div>
+                <div class="theme-toggle" role="group" aria-label="Theme toggle">
+                    <span class="theme-label dark-label">DARK</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="theme-toggle" aria-label="Toggle light mode">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="theme-label light-label">LIGHT</span>
+                </div>
             </div>
         </header>
 
