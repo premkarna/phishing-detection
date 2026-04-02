@@ -1,22 +1,22 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Phishing Sentinel | Enterprise</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body data-theme="dark">
     <div class="cyber-grid-bg"></div>
-    
+
     <div class="container">
-        <header>
-            <div class="logo">
-                <span class="icon">🛡️</span>
-                <h1>PHISHING_<span>SENTINEL</span></h1>
-            </div>
-            <div class="header-actions">
+      <header>
+        <div class="logo">
+          <span class="icon">🛡️</span>
+          <h1>PHISHING_<span>SENTINEL</span></h1>
+        </div>
+        <div class="header-actions">
                 <div class="status-badge">
                     <span class="dot pulse"></span> ENGINE ACTIVE
                 </div>
@@ -29,86 +29,137 @@
                     <span class="theme-label light-label">LIGHT</span>
                 </div>
             </div>
-        </header>
+      </header>
 
-        <section class="search-section">
-            <p class="subtitle">Advanced Neural-Net Threat Detection System</p>
-            <div class="search-box">
-                <input type="text" id="target-url" placeholder="Enter target URL (e.g., netmirror.com)" autocomplete="off">
-                <button id="scan-btn" onclick="initiateScan()">
-                    <span id="btn-text">INITIATE SCAN</span>
-                    <span id="btn-loader" class="hidden">ANALYZING...</span>
-                </button>
+      <section class="search-section">
+        <p class="subtitle">Advanced Neural-Net Threat Detection System</p>
+        <div class="search-box">
+          <input
+            type="text"
+            id="target-url"
+            placeholder="Enter target URL (e.g., netmirror.com)"
+            autocomplete="off"
+          />
+          <button id="scan-btn" onclick="initiateScan()">
+            <span id="btn-text">INITIATE SCAN</span>
+            <span id="btn-loader" class="hidden">ANALYZING...</span>
+          </button>
+        </div>
+        <div class="qr-upload">
+          <input type="file" id="qr-input" accept="image/*" hidden />
+          <button onclick="document.getElementById('qr-input').click()">
+            📷 UPLOAD QR
+          </button>
+          <span id="qr-status" class="subtitle"></span>
+        </div>
+        <div id="error-box" class="error-msg hidden"></div>
+      </section>
+
+      <section id="results-dashboard" class="hidden">
+        <div id="verdict-banner" class="verdict-banner safe">
+          <h2 id="final-verdict">FINAL VERDICT: SAFE</h2>
+        </div>
+
+        <div class="data-grid">
+          <div class="card intel-card">
+            <h3>⚡ Core Intelligence</h3>
+            <div class="data-row">
+              <span class="label">Target:</span>
+              <span id="res-url" class="value">...</span>
             </div>
-            <div id="error-box" class="error-msg hidden"></div>
-        </section>
-
-        <section id="results-dashboard" class="hidden">
-            
-            <div id="verdict-banner" class="verdict-banner safe">
-                <h2 id="final-verdict">FINAL VERDICT: SAFE</h2>
+            <div class="data-row">
+              <span class="label">Site Status:</span>
+              <span id="res-status" class="value">...</span>
             </div>
-
-            <div class="data-grid">
-                <div class="card intel-card">
-                    <h3>⚡ Core Intelligence</h3>
-                    <div class="data-row"><span class="label">Target:</span> <span id="res-url" class="value">...</span></div>
-                    <div class="data-row"><span class="label">Site Status:</span> <span id="res-status" class="value">...</span></div>
-                    <div class="data-row"><span class="label">Server IP/Loc:</span> <span id="res-loc" class="value">...</span></div>
-                    <div class="data-row"><span class="label">Domain Age:</span> <span id="res-age" class="value">...</span></div>
-                    <div class="data-row"><span class="label">SSL Cert:</span> <span id="res-ssl" class="value">...</span></div>
-                </div>
-
-                <div class="card threat-card">
-                    <h3>🦠 Threat Vectors</h3>
-                    <div class="data-row"><span class="label">VirusTotal:</span> <span id="res-vt" class="value">...</span></div>
-                    <div class="data-row"><span class="label">Brand Check:</span> <span id="res-typo" class="value">...</span></div>
-                    <div class="data-row"><span class="label">HTML Scan:</span> <span id="res-html" class="value">...</span></div>
-                    <div class="data-row"><span class="label">URLHaus:</span> <span id="res-urlhaus" class="value">...</span></div>
-                </div>
+            <div class="data-row">
+              <span class="label">Server IP/Loc:</span>
+              <span id="res-loc" class="value">...</span>
             </div>
+            <div class="data-row">
+              <span class="label">Domain Age:</span>
+              <span id="res-age" class="value">...</span>
+            </div>
+            <div class="data-row">
+              <span class="label">SSL Cert:</span>
+              <span id="res-ssl" class="value">...</span>
+            </div>
+          </div>
 
-            <div class="bottom-grid">
-                <div class="card ai-terminal">
-                    <div class="terminal-header">
-                        <span class="dots"><span></span><span></span><span></span></span>
-                        <span>Gemini AI Analyst Output</span>
-                    </div>
-                    <div id="ai-output" class="terminal-body">
-                        Awaiting scan data...
-                    </div>
-                </div>
-                <div class="card site-preview">
-                    <h3>👁️ Safe Visual Preview</h3>
-                    <p id="preview-placeholder" style="text-align: center; color: #888;">Generating Preview...</p>
-        
-        <img id="res-screenshot" src="" alt="Site Preview" style="display: none; cursor: pointer; width: 100%; border-radius: 8px;" onclick="document.getElementById('imageModal').style.display='block'; document.getElementById('zoomedImage').src=this.src;">
+          <div class="card threat-card">
+            <h3>🦠 Threat Vectors</h3>
+            <div class="data-row">
+              <span class="label">VirusTotal:</span>
+              <span id="res-vt" class="value">...</span>
+            </div>
+            <div class="data-row">
+              <span class="label">Brand Check:</span>
+              <span id="res-typo" class="value">...</span>
+            </div>
+            <div class="data-row">
+              <span class="label">HTML Scan:</span>
+              <span id="res-html" class="value">...</span>
+            </div>
+            <div class="data-row">
+              <span class="label">URLHaus:</span>
+              <span id="res-urlhaus" class="value">...</span>
+            </div>
+          </div>
+        </div>
 
-    <div id="imageModal" class="modal">
-        <span class="close-modal" onclick="document.getElementById('imageModal').style.display='none';">&times;</span>
-        <img class="modal-content" id="zoomedImage">
+        <div class="bottom-grid">
+          <div class="card ai-terminal">
+            <div class="terminal-header">
+              <span class="dots"><span></span><span></span><span></span></span>
+              <span>Gemini AI Analyst Output</span>
+            </div>
+            <div id="ai-output" class="terminal-body">
+              Awaiting scan data...
+            </div>
+          </div>
+          <div class="card site-preview">
+            <h3>👁️ Safe Visual Preview</h3>
+            <p id="preview-placeholder" style="text-align: center; color: #888">
+              Generating Preview...
+            </p>
+
+            <img
+              id="res-screenshot"
+              src=""
+              alt="Site Preview"
+              style="
+                display: none;
+                cursor: pointer;
+                width: 100%;
+                border-radius: 8px;
+              "
+              onclick="
+                document.getElementById('imageModal').style.display = 'block';
+                document.getElementById('zoomedImage').src = this.src;
+              "
+            />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn-secondary" onclick="window.print()">
+            📥 EXPORT REPORT
+          </button>
+        </div>
+      </section>
     </div>
-                </div>
-            </div>
-
-            <div class="actions">
-                <button class="btn-secondary" onclick="window.print()">📥 EXPORT REPORT</button>
-            </div>
-        </section>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
     <script src="script.js"></script>
 
     <div id="imageModal" class="modal">
-        <span class="close-modal">&times;</span>
-        <img class="modal-content" id="zoomedImage">
+      <span class="close-modal">&times;</span>
+      <img class="modal-content" id="zoomedImage" />
     </div>
 
     <div id="scan-overlay" class="scan-overlay">
-        <div class="radar">
-            <div class="radar-line"></div>
-        </div>
-        <p class="hacker-loader-text">SEARCHING FOR THREATS...</p>
+      <div class="radar">
+        <div class="radar-line"></div>
+      </div>
+      <p class="hacker-loader-text">SEARCHING FOR THREATS...</p>
     </div>
 </body>
 </html>
