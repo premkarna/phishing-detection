@@ -22,14 +22,14 @@
 
 <div align="center">
 
+### 🖼️ Screenshots & GIFs Coming Soon!
+
 | 🌀 **3D Threat Graph** | 🚨 **Critical Alert Detection** |
 |:---:|:---:|
-| ![3D Graph Demo](docs/assets/demo_3d_graph.gif) | ![Critical Alert](docs/assets/demo_critical_alert.png) |
 | *Real-time threat visualization* | *ATO Risk Detection* |
 
 | 📊 **SOC Dashboard** | 🎯 **QR Analysis** |
 |:---:|:---:|
-| ![Dashboard](docs/assets/demo_dashboard.png) | ![QR Scan](docs/assets/demo_qr_scan.gif) |
 | *Live metrics & accuracy tracking* | *Zero-click quishing detection* |
 
 </div>
@@ -39,6 +39,8 @@
 > pip install -r requirements.txt && python main.py
 > ```
 > Then open http://localhost:5000 🚀
+> 
+> 📸 *Add your screenshots to `docs/assets/` - see [docs/assets/README.md](docs/assets/README.md) for guide*
 
 ---
 
@@ -66,36 +68,68 @@
 
 ```
 Phishing-detection/
-├── core/                    # 7 Detection Engines
-│   ├── url_engine.py
-│   ├── quishing_engine.py
-│   ├── eml_engine.py
-│   ├── smishing_engine.py
-│   ├── vishing_engine.py
-│   ├── clone_engine.py
-│   └── socialengineering_engine.py
+├── app/                              # Main application package
+│   ├── core/                         # 🎯 7 Detection Engines + utilities
+│   │   ├── url_engine.py             # URL analysis & threat intel
+│   │   ├── quishing_engine.py        # QR code phishing detection
+│   │   ├── eml_engine.py             # Email forensics & analysis
+│   │   ├── smishing_engine.py        # SMS phishing detection
+│   │   ├── vishing_engine.py         # Voice call scam detection
+│   │   ├── clone_engine.py           # Website cloning detection
+│   │   ├── socialengineering_engine.py  # Social engineering analysis
+│   │   ├── visual_analyzer.py        # AI visual phishing detection
+│   │   ├── pdf_analyzer.py           # PDF attachment analysis
+│   │   ├── dom_scanner.py            # DOM structure analysis
+│   │   ├── vishing_features.py       # Voice feature extraction
+│   │   └── zero_click_extractor.py   # Zero-click IOC extraction
+│   │
+│   ├── ml/                           # 🤖 Machine Learning modules
+│   │   ├── local_ml.py               # Offline ML detector
+│   │   ├── pattern_analyzer.py       # Pattern matching engine
+│   │   └── training_pipeline.py      # Model training pipeline
+│   │
+│   ├── intelligence/                 # 🧠 Intelligence & Analysis
+│   │   ├── ioc.py                    # IOC feed management
+│   │   ├── attribution.py            # Campaign attribution engine
+│   │   ├── temporal.py               # Temporal analysis
+│   │   ├── sandbox.py                # Sandbox detonation
+│   │   ├── sandbox_engine.py         # Advanced sandbox
+│   │   ├── fingerprinting.py         # QR fingerprinting
+│   │   ├── browser_fingerprinting.py # Browser tracking detection
+│   │   ├── deception.py              # Deception detection
+│   │   └── countermeasures.py        # Auto countermeasures
+│   │
+│   ├── services/                     # ⚙️ Core Services
+│   │   ├── ai_handler.py             # Gemini AI multi-key handler
+│   │   ├── threat_sync.py            # Global threat synchronization
+│   │   ├── auto_sync.py              # Auto-sync scheduler
+│   │   ├── accuracy_engine.py        # Accuracy tracking
+│   │   ├── executive_reporting.py   # PDF report generation
+│   │   ├── report_generator.py       # Report builder
+│   │   ├── integration_hub.py        # SIEM/SOAR integrations
+│   │   ├── soar_playbook.py          # SOAR automation
+│   │   └── url_tracer.py             # URL tracing service
+│   │
+│   ├── api/                          # 🔌 REST API Endpoints
+│   │   └── v1/                       # API Version 1
+│   │       ├── analysis.py           # Analysis endpoints
+│   │       ├── detection.py          # Detection endpoints
+│   │       └── health.py             # Health check endpoints
+│   │
+│   ├── integrations/                 # 🔗 External Integrations
+│   ├── utils/                        # 🛠️ Shared Utilities
+│   └── web/                          # 🌐 Web Interface
+│       ├── templates/                # Flask HTML templates
+│       └── static/                   # CSS, JS, assets
 │
-├── utils/                   # 18 Utility & Intelligence Modules
-│   ├── ai_handler.py        # Gemini multi-key consensus engine
-│   ├── gpu_integration.py   # RTX 3050 CUDA acceleration
-│   ├── visual_analyzer.py   # AI visual phishing detection
-│   ├── sandbox_detonator.py # Playwright-based isolated analysis
-│   ├── threat_intel.py      # VirusTotal, URLScan, AbuseIPDB
-│   ├── ioc_feed_manager.py  # Global IOC threat feeds
-│   ├── ml_detector.py       # Offline rule-based ML engine
-│   ├── honeytoken_manager.py
-│   ├── campaign_attribution.py
-│   ├── temporal_analysis.py
-│   └── ...                  # + 8 more modules
-│
-├── templates/               # Flask HTML templates (index, report, accuracy)
-├── static/                  # Frontend JS & CSS
-├── data/                    # Threat DB, IOC cache, QR fingerprints
-├── tests/                   # 23+ automated test modules
-├── run/                     # Test runners
-├── docs/                    # Deployment & GPU guides
-├── main.py                  # Flask app entry point
-└── requirements.txt
+├── tests/                            # 🧪 23+ Test modules
+├── docs/                             # 📚 Documentation
+│   ├── assets/                       # Screenshots & GIFs
+│   ├── DEPLOYMENT_GUIDE.md
+│   └── GPU_SETUP_GUIDE.md
+├── data/                             # 💾 Local data storage
+├── main.py                           # 🚀 Flask app entry point
+└── requirements.txt                  # 📦 Python dependencies
 ```
 
 ---
