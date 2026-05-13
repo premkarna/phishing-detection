@@ -1,2 +1,32 @@
 .env
 __pycache__
+
+# Data files should only be in data/ folder - ignore if created in root
+/global_threats.db
+/ioc_cache.json
+/qr_fingerprints.json
+/soc_metrics.json
+/threat_actors.json
+
+# Report files - keep in docs/ but ignore in root
+*.docx
+*.pdf
+*.doc
+
+# Generated reports
+/reports/*.pdf
+/reports/*.html
+/reports/*.docx
+
+# Sandbox evidence (generated during runtime)
+/sandbox_evidence/*
+!/sandbox_evidence/.gitkeep
+
+# Logs
+*.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo

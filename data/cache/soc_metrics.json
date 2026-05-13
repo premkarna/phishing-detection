@@ -1,0 +1,10 @@
+{
+    "TP": 11,
+    "TN": 10,
+    "FP": 2,
+    "FN": 1,
+    "accuracy": 87.5,
+    "precision": 84.62,
+    "recall": 91.67,
+    "f1_score": 88.0
+}

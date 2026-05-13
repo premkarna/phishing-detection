@@ -1,0 +1,204 @@
+{
+  "actors": {
+    "TA-QR-001": {
+      "actor_id": "TA-QR-001",
+      "name": "QRPhish-Alpha",
+      "aliases": [
+        "AlphaQR",
+        "QuickPhish"
+      ],
+      "first_seen": "2023-01-15",
+      "ttps": {
+        "initial_access": [
+          "qr_code_social_media",
+          "qr_code_email"
+        ],
+        "infrastructure": [
+          "free_tld_domains",
+          "cloudflare_proxy"
+        ],
+        "payload_delivery": [
+          "credential_harvesting",
+          "fake_login_forms"
+        ],
+        "evasion": [
+          "domain_rotation",
+          "short_url_obfuscation"
+        ]
+      },
+      "infrastructure": {
+        "tlds": [
+          ".tk",
+          ".ml",
+          ".ga"
+        ],
+        "patterns": [
+          "/secure/login.php",
+          "/auth/verify"
+        ],
+        "services": [
+          "bit.ly",
+          "tinyurl"
+        ]
+      },
+      "targets": [
+        "financial",
+        "healthcare",
+        "retail"
+      ],
+      "description": "Opportunistic QR phishing group targeting multiple sectors"
+    },
+    "TA-QR-002": {
+      "actor_id": "TA-QR-002",
+      "name": "BankQR-Phantom",
+      "aliases": [
+        "PhantomBank",
+        "QR-Banker"
+      ],
+      "first_seen": "2023-06-20",
+      "ttps": {
+        "initial_access": [
+          "qr_code_physical_posters",
+          "qr_code_flyers"
+        ],
+        "infrastructure": [
+          "typosquat_domains",
+          "brand_impersonation"
+        ],
+        "payload_delivery": [
+          "banking_credential_harvest",
+          "2fa_bypass"
+        ],
+        "evasion": [
+          "ssl_certificate",
+          "domain_age_manipulation"
+        ]
+      },
+      "infrastructure": {
+        "tlds": [
+          ".com",
+          ".net",
+          ".online"
+        ],
+        "patterns": [
+          "/login/secure",
+          "/verify/account"
+        ],
+        "targets_brands": [
+          "chase",
+          "wellsfargo",
+          "bankofamerica",
+          "citi"
+        ]
+      },
+      "targets": [
+        "banking",
+        "fintech"
+      ],
+      "description": "Sophisticated banking-focused QR phishing group"
+    },
+    "TA-QR-003": {
+      "actor_id": "TA-QR-003",
+      "name": "RetailQR-Snatcher",
+      "aliases": [
+        "SnatchQR",
+        "RetailPhish"
+      ],
+      "first_seen": "2023-09-10",
+      "ttps": {
+        "initial_access": [
+          "qr_code_payment_terminals",
+          "qr_code_receipts"
+        ],
+        "infrastructure": [
+          "brand_typosquat",
+          "payment_portal_clone"
+        ],
+        "payload_delivery": [
+          "payment_credential_harvest",
+          "gift_card_fraud"
+        ],
+        "evasion": [
+          "session_hijacking",
+          "redirect_chains"
+        ]
+      },
+      "infrastructure": {
+        "tlds": [
+          ".shop",
+          ".store",
+          ".online"
+        ],
+        "patterns": [
+          "/payment/confirm",
+          "/checkout/secure"
+        ],
+        "targets_brands": [
+          "amazon",
+          "walmart",
+          "target",
+          "bestbuy"
+        ]
+      },
+      "targets": [
+        "retail",
+        "e-commerce",
+        "payment_processors"
+      ],
+      "description": "Retail and payment-focused QR phishing operation"
+    },
+    "TA-QR-004": {
+      "actor_id": "TA-QR-004",
+      "name": "APT-QR-Dragon",
+      "aliases": [
+        "DragonQR",
+        "QR-APT"
+      ],
+      "first_seen": "2022-11-05",
+      "ttps": {
+        "initial_access": [
+          "qr_code_spearphishing",
+          "qr_code_conferences"
+        ],
+        "infrastructure": [
+          "compromised_legitimate_domains",
+          "bulletproof_hosting"
+        ],
+        "payload_delivery": [
+          "multi_stage_payload",
+          "credential_harvest",
+          "device_fingerprinting"
+        ],
+        "evasion": [
+          "advanced_obfuscation",
+          "geofencing",
+          "device_targeting"
+        ]
+      },
+      "infrastructure": {
+        "tlds": [
+          ".com",
+          ".net",
+          ".org"
+        ],
+        "patterns": [
+          "/portal/login",
+          "/sso/authenticate"
+        ],
+        "characteristics": [
+          "aged_domains",
+          "valid_ssl",
+          "cdn_proxied"
+        ]
+      },
+      "targets": [
+        "government",
+        "defense",
+        "technology",
+        "energy"
+      ],
+      "description": "Advanced persistent threat using QR for initial access"
+    }
+  },
+  "last_updated": "2026-05-13T20:00:39.099908"
+}

@@ -1,0 +1,21 @@
+50K Enhanced ML Model Summary
+Generated: 20260513_170607
+Training Data: 50,000 URLs (25,000 legitimate + 25,000 malicious)
+Features: 24 enhanced forensic features
+Test Accuracy: 98.6% (68/69 test cases)
+Model: Random Forest with advanced feature extraction
+
+Key Improvements:
+- Enhanced feature extraction (24 features vs 12)
+- Comprehensive URL pattern recognition
+- Advanced typosquatting detection
+- Punycode and homograph detection
+- Scam keyword analysis
+- Banking fraud detection
+- Protocol mismatch detection
+- Suspicious path analysis
+
+Files:
+- Model: utils/rf_phishing_model_50k_enhanced_20260513_170607.pkl
+- Data: data/training_data_50k_enhanced_20260513_170607.csv
+- Generator: data/custom_training_50k.py

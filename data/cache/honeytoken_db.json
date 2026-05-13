@@ -1,0 +1,90 @@
+{
+  "ef7a0e03-b6bb-47c4-be2d-b15b234e10ca": {
+    "token_id": "ef7a0e03-b6bb-47c4-be2d-b15b234e10ca",
+    "email": "noreply.b8f683a6@honey-check.com",
+    "password": "Login#Secure1f7c9",
+    "qr_hash": "ec0c027402a0dec2",
+    "campaign_id": "CAMP_20260513",
+    "created_at": "2026-05-13T18:33:47.061640",
+    "expires_at": "2026-06-12T18:33:47.061640",
+    "status": "active",
+    "trigger_data": null
+  },
+  "35ae77d5-33db-4460-9be6-da2b866ced18": {
+    "token_id": "35ae77d5-33db-4460-9be6-da2b866ced18",
+    "email": "jane.doe.235a0957@trap-email.net",
+    "password": "Welcome2024!0770",
+    "qr_hash": "ec0c027402a0dec2",
+    "campaign_id": "CAMP_20260513",
+    "created_at": "2026-05-13T18:51:12.114704",
+    "expires_at": "2026-06-12T18:51:12.114704",
+    "status": "active",
+    "trigger_data": null
+  },
+  "bf7daa15-a6b6-44d1-9525-e55113095a49": {
+    "token_id": "bf7daa15-a6b6-44d1-9525-e55113095a49",
+    "email": "billing.4a0e17f7@trap-email.net",
+    "password": "Access2024!417c",
+    "qr_hash": "ec0c027402a0dec2",
+    "campaign_id": "CAMP_20260513",
+    "created_at": "2026-05-13T19:09:01.728706",
+    "expires_at": "2026-06-12T19:09:01.728706",
+    "status": "active",
+    "trigger_data": null
+  },
+  "e2a1280a-f555-4b5a-b830-4a33564aaf53": {
+    "token_id": "e2a1280a-f555-4b5a-b830-4a33564aaf53",
+    "email": "contact.dec557fd@honey-check.com",
+    "password": "Admin@20242a75",
+    "qr_hash": "ec0c027402a0dec2",
+    "campaign_id": "CAMP_20260513",
+    "created_at": "2026-05-13T19:24:51.459648",
+    "expires_at": "2026-06-12T19:24:51.459648",
+    "status": "active",
+    "trigger_data": null
+  },
+  "af1afc2b-296d-43b6-8d03-439bb532bc19": {
+    "token_id": "af1afc2b-296d-43b6-8d03-439bb532bc19",
+    "email": "info.6e8a0a0a@bait-account.org",
+    "password": "Admin@2024d22e",
+    "qr_hash": "90eb5f6b0201dc5f",
+    "campaign_id": "test_campaign",
+    "created_at": "2026-05-13T19:28:07.724696",
+    "expires_at": "2026-06-12T19:28:07.724696",
+    "status": "active",
+    "trigger_data": null
+  },
+  "934a509f-f4b1-46bc-b750-96abdd29f29b": {
+    "token_id": "934a509f-f4b1-46bc-b750-96abdd29f29b",
+    "email": "noreply.6ff9f49c@canary-login.com",
+    "password": "Access2024!aca1",
+    "qr_hash": "ec0c027402a0dec2",
+    "campaign_id": "CAMP_20260513",
+    "created_at": "2026-05-13T19:29:16.687004",
+    "expires_at": "2026-06-12T19:29:16.687004",
+    "status": "active",
+    "trigger_data": null
+  },
+  "eea64c16-5a47-442c-929e-0dc274b6fd86": {
+    "token_id": "eea64c16-5a47-442c-929e-0dc274b6fd86",
+    "email": "noreply.dc91ca9f@trap-email.net",
+    "password": "Access2024!9276",
+    "qr_hash": "7330c73f31fbe56e",
+    "campaign_id": "test",
+    "created_at": "2026-05-13T19:33:00.069454",
+    "expires_at": "2026-06-12T19:33:00.069454",
+    "status": "active",
+    "trigger_data": null
+  },
+  "f5f1221c-0521-487e-a0c6-2c05cec03ce3": {
+    "token_id": "f5f1221c-0521-487e-a0c6-2c05cec03ce3",
+    "email": "user.77423913@bait-account.org",
+    "password": "P@ssw0rd20246bee",
+    "qr_hash": "7330c73f31fbe56e",
+    "campaign_id": "test",
+    "created_at": "2026-05-13T19:45:07.961934",
+    "expires_at": "2026-06-12T19:45:07.961934",
+    "status": "active",
+    "trigger_data": null
+  }
+}

@@ -1,0 +1,167 @@
+"""
+10K URLs Training Data Generator
+Legitimate + Malicious URLs for Local ML Training
+"""
+
+import random
+import string
+
+# Legitimate URLs (5K)
+legitimate_domains = [
+    "google.com", "facebook.com", "amazon.com", "microsoft.com", "apple.com",
+    "netflix.com", "youtube.com", "instagram.com", "twitter.com", "linkedin.com",
+    "github.com", "stackoverflow.com", "wikipedia.org", "reddit.com", "medium.com",
+    "paypal.com", "ebay.com", "craigslist.org", "imdb.com", "spotify.com",
+    "dropbox.com", "slack.com", "zoom.us", "adobe.com", "oracle.com",
+    "salesforce.com", "shopify.com", "wordpress.org", "joomla.org", "drupal.org",
+    "bankofamerica.com", "chase.com", "wellsfargo.com", "citibank.com", "capitalone.com",
+    "hdfcbank.com", "icicibank.com", "sbi.co.in", "axisbank.com", "kotak.com",
+    "flipkart.com", "amazon.in", "myntra.com", "ajio.com", "nykaa.com",
+    "zomato.com", "swiggy.com", "uber.com", "ola.com", "rapido.com",
+    "makemytrip.com", "goibibo.com", "booking.com", "expedia.com", "airbnb.com",
+    "educational.edu", "coursera.org", "udemy.com", "khanacademy.org", "edx.org",
+    "news.cnn.com", "bbc.co.uk", "reuters.com", "washingtonpost.com", "nytimes.com"
+]
+
+legitimate_paths = [
+    "/", "/home", "/login", "/dashboard", "/profile", "/settings",
+    "/products", "/services", "/about", "/contact", "/help", "/support",
+    "/search", "/browse", "/category", "/item", "/cart", "/checkout",
+    "/account", "/billing", "/history", "/orders", "/wishlist", "/favorites",
+    "/blog", "/news", "/updates", "/announcements", "/press", "/media",
+    "/docs", "/api", "/developers", "/resources", "/tools", "/downloads",
+    "/community", "/forum", "/discussions", "/questions", "/answers", "/tutorials",
+    "/privacy", "/terms", "/legal", "/policy", "/security", "/guidelines"
+]
+
+# Malicious URL patterns
+malicious_patterns = [
+    # Typosquatting
+    "goog1e.com", "g00gle.com", "googgle.com", "googel.com", "gogle.com",
+    "faceb00k.com", "faceboook.com", "facbook.com", "facebok.com", "faebook.com",
+    "arnazon.com", "amazom.com", "amazin.com", "amizon.com", "anazon.com",
+    "microsoftt.com", "micr0soft.com", "microsft.com", "microsot.com", "micosoft.com",
+    "aple.com", "app1e.com", "applle.com", "applee.com", "appple.com",
+    
+    # Punycode/Homograph
+    "xn--googl-pma.com", "xn--facebok-q6a.com", "xn--amazn-6nf.com",
+    "xn--microsft-9va.com", "xn--appl-7ua.com", "xn--paypl-6qa.com",
+    
+    # Suspicious TLDs
+    "google.xyz", "facebook.top", "amazon.online", "microsoft.icu", "apple.cam",
+    "netflix.monster", "youtube.cfd", "instagram.zip", "twitter.online", "linkedin.xyz",
+    
+    # Phishing domains
+    "google-security.com", "facebook-verify.com", "amazon-support.net",
+    "microsoft-update.com", "apple-id.com", "paypal-secure.com",
+    "netflix-account.com", "youtube-login.com", "instagram-help.com",
+    "twitter-safe.com", "linkedin-verify.com", "gmail-support.com",
+    
+    # Scam domains
+    "prize-winner.com", "lottery-winner.net", "congratulations-prize.com",
+    "you-won-prize.com", "claim-reward.com", "free-gift-card.com",
+    "money-transfer.com", "quick-cash.com", "easy-money.net",
+    "investment-profit.com", "crypto-profit.com", "bitcoin-doubler.com"
+]
+
+malicious_paths = [
+    "/login.php", "/signin.php", "/auth.php", "/verify.php", "/update.php",
+    "/secure-login", "/account-verify", "/identity-check", "/security-update",
+    "/prize-claim", "/winner-notification", "/lottery-winner", "/congratulations",
+    "/download.php", "/install.php", "/update.exe", "/setup.exe", "/patch.exe",
+    "/survey.php", "/offer.php", "/promotion.php", "/deal.php", "/discount.php",
+    "/payment.php", "/billing.php", "/invoice.php", "/receipt.php", "/transaction.php",
+    "/support.php", "/help.php", "/contact.php", "/message.php", "/chat.php",
+    "/redirect.php", "/go.php", "/link.php", "/url.php", "/visit.php"
+]
+
+def generate_legitimate_urls(count=5000):
+    urls = []
+    for i in range(count):
+        domain = random.choice(legitimate_domains)
+        path = random.choice(legitimate_paths)
+        
+        # Add some query parameters for realism
+        if random.random() > 0.7:
+            params = ["?id=", "?page=", "?ref=", "?source=", "?utm_source="]
+            param = random.choice(params)
+            value = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+            path += param + value
+        
+        # Add random subdomain sometimes
+        if random.random() > 0.8:
+            subdomain = random.choice(["www", "mail", "blog", "shop", "app", "api"])
+            domain = f"{subdomain}.{domain}"
+        
+        url = f"https://{domain}{path}"
+        urls.append(url)
+    
+    return urls
+
+def generate_malicious_urls(count=5000):
+    urls = []
+    for i in range(count):
+        if i < len(malicious_patterns):
+            # Use predefined malicious patterns first
+            domain = malicious_patterns[i % len(malicious_patterns)]
+        else:
+            # Generate variations
+            base = random.choice(["google", "facebook", "amazon", "microsoft", "apple", "paypal"])
+            suffix = random.choice(["-security", "-verify", "-support", "-login", "-account", "-update"])
+            tld = random.choice([".com", ".net", ".org", ".xyz", ".top", ".online", ".icu", ".cam"])
+            domain = base + suffix + tld
+        
+        path = random.choice(malicious_paths)
+        
+        # Add suspicious parameters
+        if random.random() > 0.6:
+            params = ["?token=", "?session=", "?key=", "?code=", "?ref="]
+            param = random.choice(params)
+            value = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+            path += param + value
+        
+        # Random protocol (more http than https for malicious)
+        protocol = "http" if random.random() > 0.3 else "https"
+        
+        url = f"{protocol}://{domain}{path}"
+        urls.append(url)
+    
+    return urls
+
+def create_training_dataset():
+    print("Generating 10K training URLs...")
+    
+    legitimate = generate_legitimate_urls(5000)
+    malicious = generate_malicious_urls(5000)
+    
+    training_data = []
+    
+    # Add legitimate URLs
+    for url in legitimate:
+        training_data.append({"url": url, "label": "good"})
+    
+    # Add malicious URLs
+    for url in malicious:
+        training_data.append({"url": url, "label": "bad"})
+    
+    # Shuffle the data
+    random.shuffle(training_data)
+    
+    print(f"Generated {len(training_data)} URLs:")
+    print(f"  Legitimate: {len(legitimate)}")
+    print(f"  Malicious: {len(malicious)}")
+    
+    return training_data
+
+if __name__ == "__main__":
+    dataset = create_training_dataset()
+    
+    # Save to CSV
+    import csv
+    with open("data/datasets/training_data_10k.csv", "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["URL", "Label"])
+        for item in dataset:
+            writer.writerow([item["url"], item["label"]])
+    
+    print("Training data saved to: data/training_data_10k.csv")

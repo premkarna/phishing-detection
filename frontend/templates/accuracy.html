@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accuracy Dashboard | SENTINEL GUARDIAN</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #1a1a1a;
+            padding: 20px;
+            border: 1px solid #333;
+            text-align: center;
+            border-radius: 8px;
+        }
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            display: block;
+        }
+        .stat-label {
+            color: #888;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+        .matrix-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        .confusion-matrix {
+            display: grid;
+            grid-template-columns: 100px 1fr 1fr;
+            grid-template-rows: 50px 1fr 1fr;
+            gap: 10px;
+            background: #111;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #444;
+        }
+        .matrix-cell {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .tp { background-color: rgba(0, 255, 0, 0.2); border: 1px solid #00ff00; }
+        .tn { background-color: rgba(0, 255, 0, 0.1); border: 1px solid #00aa00; }
+        .fp { background-color: rgba(255, 0, 0, 0.2); border: 1px solid #ff0000; }
+        .fn { background-color: rgba(255, 165, 0, 0.2); border: 1px solid #ffa500; }
+        
+        .header-cell { font-size: 0.8em; color: #888; text-align: center; display: flex; align-items: center; justify-content: center; }
+        .side-label { transform: rotate(-90deg); grid-row: 2 / 4; grid-column: 1; }
+        
+        .btn {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover { background: #00cc00; }
+        
+        .chart-container {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ SENTINEL GUARDIAN</h1>
+            <h2>Forensic Accuracy Dashboard</h2>
+            <p>Last Evaluated: {{ metrics.last_updated }}</p>
+            <div style="margin-top: 20px;">
+                <a href="/" class="btn" style="background: #333; color: #fff;">Back to Scanner</a>
+                <button onclick="runTests()" id="runBtn" class="btn">Re-Run All Test Cases</button>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-value" style="color: #00ff00;">{{ metrics.accuracy }}%</span>
+                <span class="stat-label">Overall Accuracy</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" style="color: #3b82f6;">{{ metrics.precision }}%</span>
+                <span class="stat-label">Precision</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" style="color: #f59e0b;">{{ metrics.recall }}%</span>
+                <span class="stat-label">Recall</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" style="color: #ef4444;">{{ metrics.f1_score }}%</span>
+                <span class="stat-label">F1 Score</span>
+            </div>
+        </div>
+
+        <div class="matrix-container">
+            <div>
+                <h3>Confusion Matrix</h3>
+                <div class="confusion-matrix">
+                    <div></div>
+                    <div class="header-cell">PREDICTED PHISH</div>
+                    <div class="header-cell">PREDICTED SAFE</div>
+                    
+                    <div class="header-cell side-label">ACTUAL DATA</div>
+                    
+                    <div class="matrix-cell tp">
+                        <span style="font-size: 0.8em;">TP</span>
+                        <span>{{ metrics.TP }}</span>
+                    </div>
+                    <div class="matrix-cell fn">
+                        <span style="font-size: 0.8em;">FN</span>
+                        <span>{{ metrics.FN }}</span>
+                    </div>
+                    
+                    <div class="matrix-cell fp">
+                        <span style="font-size: 0.8em;">FP</span>
+                        <span>{{ metrics.FP }}</span>
+                    </div>
+                    <div class="matrix-cell tn">
+                        <span style="font-size: 0.8em;">TN</span>
+                        <span>{{ metrics.TN }}</span>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; font-size: 0.9em; color: #888;">
+                    <ul>
+                        <li><strong>TP:</strong> Phishing correctly identified.</li>
+                        <li><strong>TN:</strong> Legitimate correctly identified.</li>
+                        <li><strong>FP:</strong> Legitimate flagged as Phishing (Over-aggressive).</li>
+                        <li><strong>FN:</strong> Phishing missed (Critical Leak).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Accuracy History</h3>
+                <canvas id="historyChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden element to store history data from Flask -->
+    <div id="history-data" data-history='{{ metrics.get("history", []) | tojson | safe }}' style="display: none;"></div>
+
+    <script>
+        function runTests() {
+            const btn = document.getElementById('runBtn');
+            btn.innerText = "Running Forensic Tests...";
+            btn.disabled = true;
+            
+            fetch('/run_tests', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            })
+            .catch(err => {
+                alert("Error running tests");
+                btn.innerText = "Re-Run All Test Cases";
+                btn.disabled = false;
+            });
+        }
+
+        // History Chart - Get data from data attribute
+        let historyData = [];
+        const historyElement = document.getElementById('history-data');
+        if (historyElement && historyElement.dataset.history) {
+            try {
+                historyData = JSON.parse(historyElement.dataset.history);
+            } catch (e) {
+                console.log('Failed to parse history data');
+            }
+        }
+        
+        // If no history, create sample data for display
+        if (!historyData || historyData.length === 0) {
+            historyData = [
+                {timestamp: '2025-01-01 00:00:00', accuracy: 85},
+                {timestamp: '2025-01-02 00:00:00', accuracy: 90},
+                {timestamp: '2025-01-03 00:00:00', accuracy: 88},
+                {timestamp: '2025-01-04 00:00:00', accuracy: 95}
+            ];
+        }
+        
+        const ctx = document.getElementById('historyChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: historyData.map(h => h.timestamp.split(' ')[1]),
+                datasets: [{
+                    label: 'Accuracy %',
+                    data: historyData.map(h => h.accuracy),
+                    borderColor: '#00ff00',
+                    backgroundColor: 'rgba(0, 255, 0, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: false, min: 0, max: 100, grid: { color: '#333' } },
+                    x: { grid: { color: '#333' } }
+                },
+                plugins: {
+                    legend: { labels: { color: '#00ff00' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

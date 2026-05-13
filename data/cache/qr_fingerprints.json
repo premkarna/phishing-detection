@@ -1,0 +1,51 @@
+{
+  "fingerprints": {
+    "f975d467ba81d826": {
+      "fingerprint_id": "f975d467ba81d826",
+      "qr_hash": "test_campaign",
+      "payload_hash": "100680ad546ce6a5",
+      "url_pattern": "https://example.com",
+      "domain": "example.com",
+      "campaign_id": null,
+      "first_seen": "2026-05-10T14:22:47.193846",
+      "last_seen": "2026-05-10T14:22:47.193861",
+      "occurrence_count": 1,
+      "related_fingerprints": [],
+      "metadata": {}
+    },
+    "5aa4116286a27e6c": {
+      "fingerprint_id": "5aa4116286a27e6c",
+      "qr_hash": "05046f26c83e8c88",
+      "payload_hash": "05046f26c83e8c88",
+      "url_pattern": "https://google.com",
+      "domain": "google.com",
+      "campaign_id": "TA-QR-002",
+      "first_seen": "2026-05-13T18:28:20.057567",
+      "last_seen": "2026-05-13T19:43:59.678475",
+      "occurrence_count": 7,
+      "related_fingerprints": [
+        "f975d467ba81d826"
+      ],
+      "metadata": {}
+    },
+    "da68958c78d87fba": {
+      "fingerprint_id": "da68958c78d87fba",
+      "qr_hash": "ec0c027402a0dec2",
+      "payload_hash": "ec0c027402a0dec2",
+      "url_pattern": "http://evil.xyz/qr",
+      "domain": "evil.xyz",
+      "campaign_id": null,
+      "first_seen": "2026-05-13T18:28:58.611335",
+      "last_seen": "2026-05-13T19:44:03.575065",
+      "occurrence_count": 7,
+      "related_fingerprints": [],
+      "metadata": {}
+    }
+  },
+  "campaigns": {
+    "TA-QR-002": [
+      "5aa4116286a27e6c"
+    ]
+  },
+  "last_saved": "2026-05-13T19:44:03.575065"
+}

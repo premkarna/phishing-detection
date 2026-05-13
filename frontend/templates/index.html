@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel Guardian | Enterprise SOC Platform</title>
+    <meta name="description" content="Advanced phishing detection and threat intelligence platform">
+    
+    <!-- External Libraries -->
+    <script>
+        tailwind = {
+            config: {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Inter', 'sans-serif'],
+                            mono: ['JetBrains Mono', 'monospace'],
+                        },
+                        colors: {
+                            primary: {
+                                50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
+                                300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6',
+                                600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a'
+                            }
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ v }}">
+    <!-- Theme init: apply before paint to avoid flash -->
+    <script>
+        (function() {
+            var t = localStorage.getItem('sentinel-theme') || 'dark';
+            document.documentElement.className = t;
+        })();
+    </script>
+    
+</head>
+<body class="font-sans antialiased">
+    <!-- Dark mode: Matrix Background -->
+    <canvas id="matrix-canvas"></canvas>
+    <!-- Light mode: CSS Animated Orbs -->
+    <div id="light-bg" aria-hidden="true">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+        <div class="orb orb-5"></div>
+    </div>
+
+    <!-- App Container -->
+    <div class="flex flex-col min-h-screen">
+
+        <!-- Top Navbar -->
+        <header class="sticky top-0 z-50 backdrop-blur-xl border-b">
+            <div class="flex items-center justify-between px-8 h-16">
+
+                <!-- Left: Logo -->
+                <div class="flex items-center gap-3 min-w-[160px]">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/30 flex-shrink-0">
+                        <i class="fa-solid fa-shield-halved text-white text-base"></i>
+                    </div>
+                    <div class="leading-none">
+                        <span class="text-base font-bold tracking-tight">Phishing</span>
+                        <span class="text-gray-500 mx-1.5 hidden sm:inline"> </span>
+                        <span class="text-base font-bold text-blue-400 hidden sm:inline">Sentinel</span>
+                    </div>
+                </div>
+
+                <!-- Center: Nav Items -->
+                <nav class="flex items-center gap-1">
+                    <button onclick="switchTab('education')" id="nav-education" class="nav-link">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span>Education</span>
+                    </button>
+                    <button onclick="switchTab('features')" id="nav-features" class="nav-link">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>Features</span>
+                    </button>
+                    <button onclick="switchTab('scanner')" id="nav-scanner" class="nav-link nav-link-active">
+                        <i class="fa-solid fa-shield-virus"></i>
+                        <span>Scanner</span>
+                    </button>
+                    <button onclick="switchTab('intel')" id="nav-intel" class="nav-link">
+                        <i class="fa-solid fa-globe"></i>
+                        <span>Threat Intel</span>
+                    </button>
+                    <button onclick="switchTab('analytics')" id="nav-analytics" class="nav-link">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </button>
+                </nav>
+
+                <!-- Right: Status + Actions -->
+                <div class="flex items-center gap-2 min-w-[160px] justify-end">
+                    <!-- System status badge -->
+                    <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                        <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
+                        <span class="text-[11px] text-emerald-400 font-medium">Online</span>
+                    </div>
+                    <!-- Theme toggle -->
+                    <button onclick="toggleTheme()" id="theme-toggle" class="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
+                        <i id="theme-icon" class="fa-solid fa-sun text-yellow-400 text-sm"></i>
+                    </button>
+                </div>
+
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto overflow-x-hidden">
+
+            <!-- Content Area -->
+            <div class="p-8 space-y-8">
+                
+                <!-- SCANNER TAB -->
+                <div id="view-scanner" class="space-y-8 animate-fade-in">
+                    
+                    <!-- Engine Selector Cards -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                        <button onclick="setVector('url')" class="engine-card glass-card p-4 text-center group hover:border-blue-500/50 relative" data-tooltip="Detects fake URLs mimicking real brands. Checks VirusTotal, SSL, domain age, brand spoofing.">
+                            <div class="w-10 h-10 mx-auto mb-3 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                                <i class="fa-solid fa-link text-blue-400"></i>
+                            </div>
+                            <p class="text-xs font-semibold text-gray-300">URL</p>
+                            <p class="text-[10px] text-gray-500">Typosquatting</p>
+                        </button>
+                        <button onclick="setVector('qr')" class="engine-card glass-card p-4 text-center group hover:border-purple-500/50 relative" data-tooltip="Decodes QR codes & scans the embedded URL for phishing. Supports image upload + camera scan.">
+                            <div class="w-10 h-10 mx-auto mb-3 rounded-lg bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                                <i class="fa-solid fa-qrcode text-purple-400"></i>
+                            </div>
+                            <p class="text-xs font-semibold text-gray-300">QR</p>
+                            <p class="text-[10px] text-gray-500">Quishing</p>
+                        </button>
+                        <button onclick="setVector('eml')" class="engine-card glass-card p-4 text-center group hover:border-emerald-500/50 relative" data-tooltip="Analyzes .eml email files for spoofed headers, malicious links, and spear-phishing patterns.">
+                            <div class="w-10 h-10 mx-auto mb-3 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
+                                <i class="fa-solid fa-envelope text-emerald-400"></i>
+                            </div>
+                            <p class="text-xs font-semibold text-gray-300">EML</p>
+                            <p class="text-[10px] text-gray-500">Spear-Phish</p>
+                        </button>
+                        <button onclick="setVector('smishing')" class="engine-card glass-card p-4 text-center group hover:border-yellow-500/50 relative" data-tooltip="Scans SMS text & phone numbers for smishing attacks, fake OTPs, and fraud messages.">
+                            <div class="w-10 h-10 mx-auto mb-3 rounded-lg bg-yellow-500/10 flex items-center justify-center group-hover:bg-yellow-500/20 transition-colors">
+                                <i class="fa-solid fa-comment-sms text-yellow-400"></i>
+                            </div>
+                            <p class="text-xs font-semibold text-gray-300">SMS</p>
+                            <p class="text-[10px] text-gray-500">Smishing</p>
+                        </button>
+                        <button onclick="setVector('vishing')" class="engine-card glass-card p-4 text-center group hover:border-rose-500/50 relative" data-tooltip="Detects voice phishing via audio file upload or live recording. Flags impersonation patterns.">
+                            <div class="w-10 h-10 mx-auto mb-3 rounded-lg bg-rose-500/10 flex items-center justify-center group-hover:bg-rose-500/20 transition-colors">
+                                <i class="fa-solid fa-phone text-rose-400"></i>
+                            </div>
+                            <p class="text-xs font-semibold text-gray-300">Voice</p>
+                            <p class="text-[10px] text-gray-500">Vishing</p>
+                        </button>
+                        <button onclick="setVector('clone')" class="engine-card glass-card p-4 text-center group hover:border-cyan-500/50 relative" data-tooltip="Compares a suspect site's DOM structure to known brands to detect cloned/mirror phishing pages.">
+                            <div class="w-10 h-10 mx-auto mb-3 rounded-lg bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+                                <i class="fa-solid fa-clone text-cyan-400"></i>
+                            </div>
+                            <p class="text-xs font-semibold text-gray-300">Clone</p>
+                            <p class="text-[10px] text-gray-500">Site Radar</p>
+                        </button>
+                        <button onclick="setVector('social')" class="engine-card glass-card p-4 text-center group hover:border-orange-500/50 relative" data-tooltip="AI-powered detection of urgency/fear manipulation tactics used in social engineering attacks.">
+                            <div class="w-10 h-10 mx-auto mb-3 rounded-lg bg-orange-500/10 flex items-center justify-center group-hover:bg-orange-500/20 transition-colors">
+                                <i class="fa-solid fa-users text-orange-400"></i>
+                            </div>
+                            <p class="text-xs font-semibold text-gray-300">Social</p>
+                            <p class="text-[10px] text-gray-500">Engineering</p>
+                        </button>
+                    </div>
+
+                    <!-- Input Section -->
+                    <div class="glass-panel p-8 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl"></div>
+                        
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-6">
+                                <div class="flex items-center gap-3">
+                                    <span id="active-engine-badge" class="badge badge-primary">
+                                        <i class="fa-solid fa-link"></i> URL Forensics
+                                    </span>
+                                    <span class="text-xs text-gray-500">Active Engine</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-500">Upload File</span>
+                                    <label class="btn btn-secondary p-3 cursor-pointer">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <input type="file" id="file-upload" class="hidden" accept="*/*">
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Dynamic Input Container -->
+                            <div id="input-container">
+                                <!-- URL/Clone/Social: Text Input -->
+                                <div id="input-text" class="flex gap-4">
+                                    <div class="flex-1 relative">
+                                        <i class="fa-solid fa-terminal absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                                        <input type="text" id="payload" placeholder="Enter target URL..." class="input-field pl-12 pr-4 py-4" onkeydown="if(event.key === 'Enter') simulateScan()">
+                                    </div>
+                                    <button onclick="simulateScan()" class="btn btn-primary px-8">
+                                        <i class="fa-solid fa-radar"></i>
+                                        <span>Scan Now</span>
+                                    </button>
+                                </div>
+                                
+                                <!-- QR: Scanner or Text/File -->
+                                <div id="input-qr" class="hidden space-y-4">
+                                    <div class="flex gap-4">
+                                        <div class="flex-1 relative">
+                                            <i class="fa-solid fa-qrcode absolute left-4 top-1/2 -translate-y-1/2 text-purple-400"></i>
+                                            <input type="text" id="qr-payload" placeholder="Paste QR code data..." class="input-field pl-12 pr-4 py-4" onkeydown="if(event.key === 'Enter') simulateScan()">
+                                        </div>
+                                        <button onclick="simulateScan()" class="btn btn-primary px-8">
+                                            <i class="fa-solid fa-radar"></i>
+                                            <span>Scan</span>
+                                        </button>
+                                    </div>
+                                    <div class="flex gap-4">
+                                        <label class="btn btn-secondary flex-1 cursor-pointer">
+                                            <i class="fa-solid fa-camera"></i>
+                                            <span>Upload QR Image</span>
+                                            <input type="file" id="qr-file" class="hidden" accept="image/*" onchange="handleQRUpload(this)">
+                                        </label>
+                                        <button onclick="startQRScanner()" class="btn btn-purple flex-1">
+                                            <i class="fa-solid fa-camera"></i>
+                                            <span>Camera Scanner</span>
+                                        </button>
+                                    </div>
+                                    <!-- QR Image Preview with Detection -->
+                                    <div id="qr-image-preview" class="hidden relative rounded-xl overflow-hidden bg-black/50">
+                                        <canvas id="qr-canvas" class="w-full h-64 object-contain"></canvas>
+                                        <!-- Detection Status Overlay -->
+                                        <div id="qr-detection-status" class="absolute top-2 left-2 px-3 py-1 rounded-full bg-black/70 text-xs font-medium">
+                                            <i class="fa-solid fa-spinner fa-spin mr-1"></i> Scanning for QR...
+                                        </div>
+                                        <!-- QR Location Info -->
+                                        <div id="qr-location-info" class="absolute bottom-2 left-2 right-2 p-2 rounded-lg bg-black/70 text-xs hidden">
+                                            <i class="fa-solid fa-crosshairs text-emerald-400 mr-1"></i>
+                                            <span id="qr-loc-text">QR detected at: top-left region</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- QR Scanner Camera View -->
+                                    <div id="qr-scanner-view" class="hidden relative h-64 bg-black rounded-xl overflow-hidden">
+                                        <video id="qr-video" class="w-full h-full object-cover"></video>
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <div class="w-48 h-48 border-2 border-purple-400 rounded-lg">
+                                                <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-purple-400"></div>
+                                                <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-purple-400"></div>
+                                                <div class="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-purple-400"></div>
+                                                <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-purple-400"></div>
+                                            </div>
+                                        </div>
+                                        <button onclick="stopQRScanner()" class="absolute top-2 right-2 w-8 h-8 bg-rose-500 rounded-full flex items-center justify-center">
+                                            <i class="fa-solid fa-xmark text-white text-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- EML: File Upload -->
+                                <div id="input-eml" class="hidden space-y-4">
+                                    <div class="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-emerald-400/50 transition-colors">
+                                        <i class="fa-solid fa-envelope text-4xl text-emerald-400 mb-4"></i>
+                                        <p class="text-sm text-gray-400 mb-4">Drag & drop .eml file or click to browse</p>
+                                        <label class="btn btn-emerald cursor-pointer">
+                                            <i class="fa-solid fa-upload"></i>
+                                            <span>Choose EML File</span>
+                                            <input type="file" id="eml-file" class="hidden" accept=".eml" onchange="handleFileSelect(this, 'eml')">
+                                        </label>
+                                    </div>
+                                    <p id="eml-filename" class="text-sm text-emerald-400 text-center hidden"></p>
+                                </div>
+                                
+                                <!-- SMS: Advanced Smishing Input -->
+                                <div id="input-smishing" class="hidden space-y-3">
+
+                                    <!-- Row 0: Sender Type Selector + Sender Value -->
+                                    <div class="flex gap-2 items-start">
+                                        <!-- Sender Type Tabs -->
+                                        <div class="flex flex-col gap-1 shrink-0">
+                                            <p class="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">Sender Type</p>
+                                            <div class="flex gap-1">
+                                                <button id="stype-alpha" onclick="setSenderType('alpha')" class="stype-btn active-stype text-[10px] px-2 py-1 rounded border border-yellow-500/40 bg-yellow-500/10 text-yellow-400 font-semibold transition-all" title="Alpha Sender — e.g. VM-SBIINB, AD-HDFC">
+                                                    <i class="fa-solid fa-font mr-1"></i>Alpha
+                                                </button>
+                                                <button id="stype-short" onclick="setSenderType('short')" class="stype-btn text-[10px] px-2 py-1 rounded border border-white/10 bg-white/5 text-gray-400 hover:border-yellow-500/30 hover:text-yellow-300 transition-all" title="Short Code — e.g. 56321, 1800, 9999">
+                                                    <i class="fa-solid fa-hashtag mr-1"></i>Shortcode
+                                                </button>
+                                                <button id="stype-long" onclick="setSenderType('long')" class="stype-btn text-[10px] px-2 py-1 rounded border border-white/10 bg-white/5 text-gray-400 hover:border-yellow-500/30 hover:text-yellow-300 transition-all" title="Long Number — e.g. +91 98765 43210, +1 408 555 1234">
+                                                    <i class="fa-solid fa-phone mr-1"></i>Long No.
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <!-- Sender Value Input -->
+                                        <div class="flex-1">
+                                            <p class="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">Sender Value <span class="text-gray-600">(optional)</span></p>
+                                            <div class="relative">
+                                                <i id="sms-sender-icon" class="fa-solid fa-font absolute left-3 top-1/2 -translate-y-1/2 text-yellow-400 text-sm"></i>
+                                                <input type="text" id="sms-sender-id" placeholder="e.g. VM-SBIINB" class="input-field pl-9 pr-3 py-2.5 text-sm font-mono">
+                                            </div>
+                                            <p id="sms-sender-hint" class="text-[10px] text-gray-500 mt-1">
+                                                <i class="fa-solid fa-circle-info mr-1 text-yellow-500/60"></i>
+                                                Alpha: <span class="text-yellow-400/70">VM-SBIINB</span>, <span class="text-yellow-400/70">AD-HDFC</span>, <span class="text-yellow-400/70">BW-AIRTEL</span> — TRAI 6-char format
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Row 1: SMS Message Content (PRIMARY) -->
+                                    <div>
+                                        <p class="text-[10px] text-gray-500 uppercase tracking-wider mb-1">SMS Message Content <span class="text-rose-400">*</span></p>
+                                        <div class="relative">
+                                            <textarea id="sms-content" placeholder="Paste full SMS message here...&#10;Supports: English, Hindi (हिन्दी), Telugu (తెలుగు), Tamil (தமிழ்)" class="input-field w-full h-28 p-4 text-sm resize-none"></textarea>
+                                            <span class="absolute bottom-2 right-3 text-[10px] text-gray-500">Ctrl+Enter to scan</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Row 2: Actions -->
+                                    <div class="flex gap-2">
+                                        <label class="btn btn-secondary cursor-pointer text-sm px-4">
+                                            <i class="fa-solid fa-file-lines"></i>
+                                            <span class="hidden sm:inline">Upload .txt</span>
+                                            <input type="file" id="sms-file" class="hidden" accept=".txt" onchange="handleSmsFileUpload(this)">
+                                        </label>
+                                        <button onclick="clearSmishingInputs()" class="btn btn-secondary px-3 text-sm" title="Clear all">
+                                            <i class="fa-solid fa-eraser"></i>
+                                        </button>
+                                        <button onclick="simulateScan()" class="btn btn-primary flex-1 text-sm">
+                                            <i class="fa-solid fa-magnifying-glass-chart"></i>
+                                            <span>Deep Scan SMS</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Row 3: Quick test templates -->
+                                    <div class="flex flex-wrap gap-1.5 items-center">
+                                        <span class="text-[10px] text-gray-500">Try sample:</span>
+                                        <button onclick="loadSmsTemplate('bank')" class="text-[10px] px-2 py-1 rounded bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 hover:bg-yellow-500/20 transition-colors">
+                                            <i class="fa-solid fa-building-columns mr-1"></i>Bank KYC
+                                        </button>
+                                        <button onclick="loadSmsTemplate('otp')" class="text-[10px] px-2 py-1 rounded bg-orange-500/10 text-orange-400 border border-orange-500/20 hover:bg-orange-500/20 transition-colors">
+                                            <i class="fa-solid fa-key mr-1"></i>OTP Harvest
+                                        </button>
+                                        <button onclick="loadSmsTemplate('prize')" class="text-[10px] px-2 py-1 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 transition-colors">
+                                            <i class="fa-solid fa-trophy mr-1"></i>Prize Scam
+                                        </button>
+                                        <button onclick="loadSmsTemplate('delivery')" class="text-[10px] px-2 py-1 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 transition-colors">
+                                            <i class="fa-solid fa-box mr-1"></i>Delivery
+                                        </button>
+                                        <button onclick="loadSmsTemplate('shortcode')" class="text-[10px] px-2 py-1 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/20 transition-colors">
+                                            <i class="fa-solid fa-hashtag mr-1"></i>Shortcode
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Voice: Audio Upload or Record -->
+                                <div id="input-vishing" class="hidden space-y-4">
+                                    <div class="flex gap-4">
+                                        <label class="btn btn-rose flex-1 cursor-pointer">
+                                            <i class="fa-solid fa-file-audio"></i>
+                                            <span>Upload Audio</span>
+                                            <input type="file" id="voice-file" class="hidden" accept="audio/*" onchange="handleFileSelect(this, 'vishing')">
+                                        </label>
+                                        <button onclick="toggleRecording()" id="record-btn" class="btn btn-rose flex-1">
+                                            <i class="fa-solid fa-microphone"></i>
+                                            <span id="record-text">Record</span>
+                                        </button>
+                                    </div>
+                                    <!-- Recording Indicator -->
+                                    <div id="recording-indicator" class="hidden flex items-center gap-3 p-4 bg-rose-500/10 rounded-lg border border-rose-500/20">
+                                        <div class="w-3 h-3 rounded-full bg-rose-500 animate-pulse"></div>
+                                        <span class="text-sm text-rose-400">Recording... <span id="record-timer">00:00</span></span>
+                                        <button onclick="stopRecording()" class="ml-auto w-8 h-8 bg-rose-500 rounded-full flex items-center justify-center">
+                                            <i class="fa-solid fa-stop text-white text-xs"></i>
+                                        </button>
+                                    </div>
+                                    <p id="voice-filename" class="text-sm text-rose-400 text-center hidden"></p>
+                                    <button onclick="simulateScan()" class="btn btn-primary w-full" id="voice-scan-btn" disabled>
+                                        <i class="fa-solid fa-radar"></i>
+                                        <span>Analyze Audio</span>
+                                    </button>
+                                </div>
+
+                                <!-- Social Engineering: URL or Free Text -->
+                                <div id="input-social" class="hidden space-y-3">
+                                    <div class="relative">
+                                        <i class="fa-solid fa-users absolute left-4 top-4 text-orange-400"></i>
+                                        <textarea id="social-payload" rows="4" placeholder="Paste a suspicious URL, DM message, WhatsApp text, LinkedIn job offer, or any social engineering content..." class="input-field pl-12 pr-4 py-4 w-full resize-none" style="height:110px;"></textarea>
+                                    </div>
+                                    <div class="flex gap-2 flex-wrap">
+                                        <span class="text-xs text-gray-500 self-center">Platform hint:</span>
+                                        <button onclick="setSocialPlatform('whatsapp')" id="sp-whatsapp" class="px-3 py-1 rounded-full text-xs border border-white/10 text-gray-400 hover:border-orange-400/50 hover:text-orange-400 transition-colors">WhatsApp</button>
+                                        <button onclick="setSocialPlatform('instagram')" id="sp-instagram" class="px-3 py-1 rounded-full text-xs border border-white/10 text-gray-400 hover:border-orange-400/50 hover:text-orange-400 transition-colors">Instagram</button>
+                                        <button onclick="setSocialPlatform('linkedin')" id="sp-linkedin" class="px-3 py-1 rounded-full text-xs border border-white/10 text-gray-400 hover:border-orange-400/50 hover:text-orange-400 transition-colors">LinkedIn</button>
+                                        <button onclick="setSocialPlatform('facebook')" id="sp-facebook" class="px-3 py-1 rounded-full text-xs border border-white/10 text-gray-400 hover:border-orange-400/50 hover:text-orange-400 transition-colors">Facebook</button>
+                                        <button onclick="setSocialPlatform(null)" id="sp-auto" class="px-3 py-1 rounded-full text-xs border border-orange-400/50 text-orange-400 transition-colors">Auto-detect</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Panel -->
+                    <div id="results-panel" class="hidden space-y-6 animate-fade-in">
+                        
+                        <!-- Top Row: Risk Score & Verdict -->
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Risk Gauge -->
+                            <div class="glass-panel p-6 flex flex-col items-center justify-center">
+                                <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-6">Threat Score</h3>
+                                <div class="relative w-48 h-48">
+                                    <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                                        <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="6"/>
+                                        <circle id="gauge-progress" cx="50" cy="50" r="42" fill="none" stroke="#3b82f6" stroke-width="6" 
+                                            stroke-dasharray="264" stroke-dashoffset="264" stroke-linecap="round"
+                                            class="transition-all duration-1000"/>
+                                    </svg>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                        <span id="risk-val" class="text-6xl font-bold font-mono">0</span>
+                                        <span class="text-xs text-gray-500 mt-1">/ 100</span>
+                                    </div>
+                                </div>
+                                <div id="verdict-label" class="mt-4 px-4 py-2 rounded-full text-xs font-semibold border border-blue-500/30 text-blue-400">
+                                    AWAITING SCAN
+                                </div>
+                            </div>
+
+                            <!-- AI Verdict Card -->
+                            <div class="lg:col-span-2 glass-panel p-6">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                                        <i class="fa-solid fa-brain text-blue-400"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold">L3 SOC Analyst Verdict</h3>
+                                        <p class="text-xs text-gray-500">Gemini 2.0 Flash Consensus</p>
+                                    </div>
+                                </div>
+                                
+                                <div id="ai-verdict" class="text-4xl font-bold mb-4">--</div>
+
+                                <div id="false-positive-banner" class="hidden mb-4 px-4 py-3 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-300 text-sm"></div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- Analysis Card -->
+                                    <div class="analysis-card">
+                                        <div class="analysis-section-title">
+                                            <i class="fa-solid fa-microscope text-blue-400 mr-2"></i>
+                                            Analysis
+                                        </div>
+                                        <div id="ai-reason" class="analysis-content max-h-48 overflow-y-auto">
+                                            <span class="text-gray-400 italic">Initialize threat scan to begin multi-vector forensic analysis...</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Recommendation Card -->
+                                    <div class="recommendation-card">
+                                        <div class="recommendation-title">
+                                            <i class="fa-solid fa-lightbulb mr-2"></i>
+                                            Recommendation
+                                        </div>
+                                        <div id="ai-advice" class="recommendation-content max-h-48 overflow-y-auto">
+                                            <span class="text-gray-400 italic">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Technical Details Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="glass-card p-4">
+                                <p class="text-xs text-gray-500 uppercase mb-1">Server IP</p>
+                                <p id="res-ip" class="font-mono text-sm text-blue-400">--</p>
+                            </div>
+                            <div class="glass-card p-4">
+                                <p class="text-xs text-gray-500 uppercase mb-1">Domain Age</p>
+                                <p id="res-age" class="font-mono text-sm">--</p>
+                            </div>
+                            <div class="glass-card p-4">
+                                <p class="text-xs text-gray-500 uppercase mb-1">SSL Status</p>
+                                <p id="res-ssl" class="font-mono text-sm">--</p>
+                            </div>
+                            <div class="glass-card p-4">
+                                <p class="text-xs text-gray-500 uppercase mb-1">Brand Check</p>
+                                <p id="res-brand" class="font-mono text-sm">--</p>
+                            </div>
+                        </div>
+
+                        <!-- Second Row: VirusTotal + URLHaus -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="glass-card p-4 border border-white/10">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-shield-virus text-rose-400 text-sm"></i>
+                                    <p class="text-xs text-gray-500 uppercase font-semibold">VirusTotal</p>
+                                </div>
+                                <p id="res-vt" class="font-mono text-sm">--</p>
+                            </div>
+                            <div class="glass-card p-4 border border-white/10">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-database text-yellow-400 text-sm"></i>
+                                    <p class="text-xs text-gray-500 uppercase font-semibold">URLHaus</p>
+                                </div>
+                                <p id="res-urlhaus" class="font-mono text-sm">--</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Download SOC PDF Report Button -->
+                        <div class="flex justify-end">
+                            <button id="download-report-btn" onclick="downloadReport()" class="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-semibold text-sm transition-all shadow-lg shadow-blue-500/20 border border-blue-500/40">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span>Download SOC Report</span>
+                            </button>
+                        </div>
+
+                        <!-- Live Visual Scan Results -->
+                        <div id="visual-scan-results" class="glass-panel p-6 hidden">
+                            <div class="flex items-center gap-2 mb-4">
+                                <i class="fa-solid fa-eye text-blue-400"></i>
+                                <h3 class="font-semibold">Live Visual Analysis</h3>
+                                <span class="text-xs text-gray-400 ml-2">(Actually visited the URL)</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center p-3 rounded-lg bg-white/5">
+                                        <span class="text-sm text-gray-400">Page Title</span>
+                                        <span id="visual-title" class="text-sm font-medium">--</span>
+                                    </div>
+                                    <div class="flex justify-between items-center p-3 rounded-lg bg-white/5">
+                                        <span class="text-sm text-gray-400">Detected Brand</span>
+                                        <span id="visual-brand" class="text-sm font-medium">--</span>
+                                    </div>
+                                    <div class="flex justify-between items-center p-3 rounded-lg bg-white/5">
+                                        <span class="text-sm text-gray-400">Login Form</span>
+                                        <span id="visual-login" class="text-sm font-medium">--</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="p-3 rounded-lg bg-white/5">
+                                        <p class="text-xs text-gray-500 uppercase mb-2">Visual Indicators</p>
+                                        <div id="visual-indicators" class="space-y-1 text-sm">
+                                            --
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dark Web OSINT Panel -->
+                        <div id="osint-panel" class="glass-panel p-6 hidden">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                                        <i class="fa-solid fa-user-secret text-purple-400 text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold">Dark Web OSINT</h3>
+                                        <p class="text-[10px] text-gray-500">Identity Exposure & Breach Intelligence</p>
+                                    </div>
+                                </div>
+                                <span id="osint-source-badge" class="text-[10px] px-2 py-1 rounded-full bg-white/5 text-gray-400"></span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="p-4 rounded-xl bg-white/5 space-y-2">
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wider">Email Identified</p>
+                                    <p id="osint-email" class="font-mono text-sm text-purple-300">--</p>
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wider mt-2">Identity Status</p>
+                                    <p id="osint-status" class="text-sm font-bold">--</p>
+                                </div>
+                                <div class="p-4 rounded-xl bg-white/5 space-y-2">
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wider">Leak Sources</p>
+                                    <div id="osint-leaks" class="space-y-1 text-xs">--</div>
+                                </div>
+                                <div class="p-4 rounded-xl bg-white/5 space-y-2">
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wider">Forensic Markers</p>
+                                    <div id="osint-markers" class="space-y-1 text-xs">--</div>
+                                    <div class="mt-2 pt-2 border-t border-white/5">
+                                        <p class="text-[10px] text-gray-500 uppercase tracking-wider">Risk Penalty</p>
+                                        <p id="osint-risk" class="text-sm font-bold font-mono">--</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="osint-desc" class="mt-3 text-xs text-gray-400 italic"></div>
+                        </div>
+
+                        <!-- Sandbox Detonation Panel -->
+                        <div id="sandbox-panel" class="glass-panel p-6 hidden">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                                        <i class="fa-solid fa-flask text-orange-400 text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold">Zero-Click Sandbox</h3>
+                                        <p class="text-[10px] text-gray-500">Isolated File Detonation — Pure Python, No VM Required</p>
+                                    </div>
+                                </div>
+                                <span id="sandbox-verdict-badge" class="text-xs font-bold px-3 py-1 rounded-full">--</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div class="p-4 rounded-xl bg-white/5 space-y-2">
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wider">File</p>
+                                    <p id="sandbox-filename" class="font-mono text-xs text-orange-300 break-all">--</p>
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wider mt-2">File Type</p>
+                                    <p id="sandbox-filetype" class="font-mono text-sm">--</p>
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wider mt-2">Risk Score</p>
+                                    <p id="sandbox-riskscore" class="text-sm font-bold font-mono">--</p>
+                                </div>
+                                <div class="p-4 rounded-xl bg-white/5 space-y-2">
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wider">File Hashes</p>
+                                    <div id="sandbox-hashes" class="space-y-1 font-mono text-[10px] text-gray-400 break-all">--</div>
+                                </div>
+                                <div class="p-4 rounded-xl bg-white/5 space-y-2">
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-wider">Detonation Log</p>
+                                    <div id="sandbox-logs" class="space-y-1 text-[10px] text-gray-300 font-mono max-h-32 overflow-y-auto">--</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- ══ ADVANCED SMISHING INTELLIGENCE PANEL ══ -->
+                        <div id="smishing-advanced-panel" class="glass-panel p-6 hidden border border-yellow-500/20">
+                            <div class="flex items-center gap-2 mb-5">
+                                <div class="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center">
+                                    <i class="fa-solid fa-comment-sms text-yellow-400"></i>
+                                </div>
+                                <h3 class="font-semibold">Advanced SMS Threat Intelligence</h3>
+                                <span class="ml-auto text-[10px] bg-yellow-500/10 text-yellow-400 px-2 py-1 rounded-full">6 Modules Active</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+                                <!-- Card 1: Sender Spoofing -->
+                                <div class="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-yellow-500/20 transition-all">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <i class="fa-solid fa-id-badge text-yellow-400 text-sm"></i>
+                                        <p class="text-xs font-semibold text-gray-300 uppercase tracking-wider">Sender Spoofing</p>
+                                    </div>
+                                    <div id="smishing-sender-status" class="text-sm font-bold text-gray-400 mb-1">--</div>
+                                    <div id="smishing-sender-brand" class="text-xs text-gray-500 mb-2">--</div>
+                                    <div id="smishing-sender-type" class="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-gray-400 inline-block">--</div>
+                                    <div id="smishing-sender-details" class="mt-2 space-y-1 text-[10px] text-gray-500"></div>
+                                </div>
+
+                                <!-- Card 2: Phone Intelligence -->
+                                <div class="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-blue-500/20 transition-all">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <i class="fa-solid fa-phone-slash text-blue-400 text-sm"></i>
+                                        <p class="text-xs font-semibold text-gray-300 uppercase tracking-wider">Phone Intel</p>
+                                    </div>
+                                    <div id="smishing-phone-country" class="text-sm font-bold text-gray-400 mb-1">--</div>
+                                    <div id="smishing-phone-carrier" class="text-xs text-gray-500 mb-2">--</div>
+                                    <div id="smishing-phone-type" class="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-gray-400 inline-block mb-2">--</div>
+                                    <div id="smishing-phone-flags" class="space-y-1 text-[10px] text-orange-400"></div>
+                                </div>
+
+                                <!-- Card 3: Template Fingerprint -->
+                                <div class="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-purple-500/20 transition-all">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <i class="fa-solid fa-fingerprint text-purple-400 text-sm"></i>
+                                        <p class="text-xs font-semibold text-gray-300 uppercase tracking-wider">Template Match</p>
+                                    </div>
+                                    <div id="smishing-template-label" class="text-sm font-bold text-gray-400 mb-1">--</div>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <span class="text-[10px] text-gray-500">Hash:</span>
+                                        <span id="smishing-template-hash" class="text-[10px] font-mono text-purple-300">--</span>
+                                    </div>
+                                </div>
+
+                                <!-- Card 4: OTP Harvesting -->
+                                <div class="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-rose-500/20 transition-all">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <i class="fa-solid fa-key text-rose-400 text-sm"></i>
+                                        <p class="text-xs font-semibold text-gray-300 uppercase tracking-wider">OTP / Credential Harvest</p>
+                                    </div>
+                                    <div id="smishing-otp-status" class="text-sm font-bold text-gray-400 mb-2">--</div>
+                                    <div id="smishing-otp-patterns" class="space-y-1 text-[10px] text-rose-400"></div>
+                                </div>
+
+                                <!-- Card 5: Brand Impersonation -->
+                                <div class="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-emerald-500/20 transition-all">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <i class="fa-solid fa-building-columns text-emerald-400 text-sm"></i>
+                                        <p class="text-xs font-semibold text-gray-300 uppercase tracking-wider">Brand Impersonation</p>
+                                    </div>
+                                    <div id="smishing-brand-name" class="text-sm font-bold text-gray-400 mb-1">--</div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <div class="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                            <div id="smishing-brand-conf-bar" class="h-full bg-emerald-400 rounded-full transition-all" style="width:0%"></div>
+                                        </div>
+                                        <span id="smishing-brand-conf" class="text-[10px] text-gray-400 w-8">0%</span>
+                                    </div>
+                                    <div id="smishing-brand-tactics" class="space-y-1 text-[10px] text-yellow-400"></div>
+                                </div>
+
+                                <!-- Card 6: Multi-language Detection -->
+                                <div class="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-cyan-500/20 transition-all">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <i class="fa-solid fa-language text-cyan-400 text-sm"></i>
+                                        <p class="text-xs font-semibold text-gray-300 uppercase tracking-wider">Multi-Language Detection</p>
+                                    </div>
+                                    <div id="smishing-lang-status" class="text-sm font-bold text-gray-400 mb-2">--</div>
+                                    <div id="smishing-lang-list" class="flex flex-wrap gap-1"></div>
+                                </div>
+
+                            </div>
+
+                            <!-- URL Chain (if links found) -->
+                            <div id="smishing-url-chain" class="mt-4 hidden">
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wider mb-2">
+                                    <i class="fa-solid fa-link text-yellow-400 mr-1"></i>Extracted Link Chain
+                                </p>
+                                <div id="smishing-url-chain-items" class="space-y-2"></div>
+                            </div>
+
+                            <!-- Social Engineering Keywords -->
+                            <div id="smishing-keywords-block" class="mt-4 hidden">
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wider mb-2">
+                                    <i class="fa-solid fa-triangle-exclamation text-yellow-400 mr-1"></i>Social Engineering Keywords Detected
+                                </p>
+                                <div id="smishing-keywords" class="flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+
+                        <!-- Attribution Results (Dynamic) -->
+                        <div id="attribution-results" class="glass-panel p-6 hidden">
+                            <div class="flex items-center gap-2 mb-4">
+                                <i class="fa-solid fa-user-secret text-pink-400"></i>
+                                <h3 class="font-semibold">Threat Actor Attribution</h3>
+                            </div>
+                            
+                            <!-- What is Attribution - Help Box -->
+                            <div class="p-3 rounded-lg bg-pink-500/10 border border-pink-500/20 mb-4">
+                                <p class="text-xs text-gray-300">
+                                    <i class="fa-solid fa-circle-info text-pink-400 mr-1"></i>
+                                    <strong>What is this?</strong> We analyze attack patterns to identify which known threat group likely launched it. 
+                                    Example: <strong>TA-QR-002</strong> means "Threat Actor - QR Campaign #002" — a specific group specializing in QR-based phishing attacks.
+                                </p>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <p class="text-[10px] text-gray-500 uppercase mb-2">Primary Attribution</p>
+                                    <p id="attribution-actor" class="text-lg font-bold text-pink-400">--</p>
+                                    <p id="attribution-confidence" class="text-sm text-gray-400 mt-1">--</p>
+                                </div>
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <p class="text-[10px] text-gray-500 uppercase mb-2">Matched TTPs</p>
+                                    <div id="attribution-ttps" class="space-y-1 text-sm">--</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Threat Actor Legend -->
+                            <div class="mt-4 p-3 rounded-lg bg-white/5">
+                                <p class="text-[10px] text-gray-500 uppercase mb-2">Common Threat Actor Codes</p>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-mono text-pink-400">APT28</span>
+                                        <span class="text-gray-400">Russian state-sponsored</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-mono text-pink-400">TA-QR-002</span>
+                                        <span class="text-gray-400">QR phishing specialists</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-mono text-pink-400">TA505</span>
+                                        <span class="text-gray-400">Financial crime group</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Fingerprint Results (Dynamic) -->
+                        <div id="fingerprint-results" class="glass-panel p-6 hidden">
+                            <div class="flex items-center gap-2 mb-4">
+                                <i class="fa-solid fa-fingerprint text-purple-400"></i>
+                                <h3 class="font-semibold">QR Code Fingerprint</h3>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <p class="text-[10px] text-gray-500 uppercase mb-2">Fingerprint ID</p>
+                                    <p id="fingerprint-id" class="font-mono text-sm text-purple-300">--</p>
+                                </div>
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <p class="text-[10px] text-gray-500 uppercase mb-2">Campaign Link</p>
+                                    <p id="fingerprint-campaign" class="text-sm">--</p>
+                                </div>
+                                <div class="p-4 rounded-xl bg-white/5">
+                                    <p class="text-[10px] text-gray-500 uppercase mb-2">First Seen</p>
+                                    <p id="fingerprint-first-seen" class="text-sm">--</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ENGINES TAB -->
+                <div id="view-engines" class="hidden space-y-8 animate-fade-in">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Engine Status Cards -->
+                        <div class="glass-panel p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold">7-Engine Detection Grid</h3>
+                                <span id="grid-last-updated" class="text-[10px] text-gray-500">Loading status...</span>
+                            </div>
+                            <div class="space-y-3" id="engine-status-list">
+                                <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fa-solid fa-link text-blue-400"></i>
+                                        <div>
+                                            <span class="text-sm">URL/Typosquatting Engine</span>
+                                            <p id="engine-detail-url" class="text-[10px] text-gray-500">Initializing...</p>
+                                        </div>
+                                    </div>
+                                    <span id="engine-status-url" class="badge badge-success">Active</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fa-solid fa-qrcode text-purple-400"></i>
+                                        <div>
+                                            <span class="text-sm">QR (Quishing) Engine</span>
+                                            <p id="engine-detail-qr" class="text-[10px] text-gray-500">Initializing...</p>
+                                        </div>
+                                    </div>
+                                    <span id="engine-status-qr" class="badge badge-success">Active</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fa-solid fa-envelope text-emerald-400"></i>
+                                        <div>
+                                            <span class="text-sm">EML/Spear-Phishing Engine</span>
+                                            <p id="engine-detail-eml" class="text-[10px] text-gray-500">Initializing...</p>
+                                        </div>
+                                    </div>
+                                    <span id="engine-status-eml" class="badge badge-success">Active</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fa-solid fa-comment-sms text-yellow-400"></i>
+                                        <div>
+                                            <span class="text-sm">SMS/Smishing Engine</span>
+                                            <p id="engine-detail-smishing" class="text-[10px] text-gray-500">Initializing...</p>
+                                        </div>
+                                    </div>
+                                    <span id="engine-status-smishing" class="badge badge-success">Active</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fa-solid fa-phone text-rose-400"></i>
+                                        <div>
+                                            <span class="text-sm">Voice/Vishing Engine</span>
+                                            <p id="engine-detail-vishing" class="text-[10px] text-gray-500">Initializing...</p>
+                                        </div>
+                                    </div>
+                                    <span id="engine-status-vishing" class="badge badge-success">Active</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fa-solid fa-clone text-cyan-400"></i>
+                                        <div>
+                                            <span class="text-sm">Clone Site Radar</span>
+                                            <p id="engine-detail-clone" class="text-[10px] text-gray-500">Initializing...</p>
+                                        </div>
+                                    </div>
+                                    <span id="engine-status-clone" class="badge badge-success">Active</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fa-solid fa-users text-orange-400"></i>
+                                        <div>
+                                            <span class="text-sm">Social Engineering AI</span>
+                                            <p id="engine-detail-social" class="text-[10px] text-gray-500">Initializing...</p>
+                                        </div>
+                                    </div>
+                                    <span id="engine-status-social" class="badge badge-success">Active</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Radar Animation -->
+                        <div class="glass-panel p-6 flex items-center justify-center">
+                            <div class="radar-container">
+                                <div class="radar-sweep"></div>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <div class="w-3 h-3 rounded-full bg-blue-500 animate-pulse"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ANALYTICS TAB -->
+                <div id="view-analytics" class="hidden space-y-8 animate-fade-in">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="glass-panel p-6" style="min-height: 400px;">
+                            <h3 class="font-semibold mb-4 text-lg">Accuracy Metrics</h3>
+                            <div style="position: relative; height: 320px; width: 100%;">
+                                <canvas id="metricsChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="glass-panel p-6" style="min-height: 400px;">
+                            <h3 class="font-semibold mb-4 text-lg">Threat Distribution</h3>
+                            <div style="position: relative; height: 320px; width: 100%;">
+                                <canvas id="vectorsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EDUCATIONAL HUB TAB -->
+                <div id="view-education" class="hidden space-y-8 animate-fade-in">
+                    <!-- Header -->
+                    <div class="glass-panel p-6">
+                        <div class="flex items-center gap-3 mb-1">
+                            <i class="fa-solid fa-graduation-cap text-indigo-400 text-xl"></i>
+                            <h2 class="text-xl font-bold">Phishing Awareness &amp; Education</h2>
+                        </div>
+                        <p class="text-sm text-gray-400">Learn to recognize, avoid, and report phishing attacks across all vectors.</p>
+                    </div>
+
+                    <!-- Platform Skill Progression -->
+                    <div class="glass-panel p-6 border border-indigo-500/30">
+                        <h3 class="font-semibold text-base mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-stairs text-amber-400"></i> 
+                            How to Use This Platform: Learning Path
+                        </h3>
+                        <p class="text-sm text-gray-400 mb-4">New to phishing detection? Start with basic features and progress to advanced threat hunting as you gain experience. Each level builds on the previous one.</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- BASIC -->
+                            <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                                        <i class="fa-solid fa-seedling text-emerald-400 text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-emerald-300">Step 1: Basic</h4>
+                                        <p class="text-[10px] text-emerald-400/70">Getting Started</p>
+                                    </div>
+                                </div>
+                                <ul class="space-y-2 text-xs text-gray-300">
+                                    <li class="flex items-start gap-2">
+                                        <i class="fa-solid fa-check text-emerald-400 mt-0.5 text-[10px]"></i>
+                                        <span><strong>Simple URL Scan:</strong> Paste any link and get instant safe/dangerous result with risk percentage (0-100%)</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="fa-solid fa-check text-emerald-400 mt-0.5 text-[10px]"></i>
+                                        <span><strong>QR Code Reading:</strong> Upload QR images to see decoded content and basic safety check</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="fa-solid fa-check text-emerald-400 mt-0.5 text-[10px]"></i>
+                                        <span><strong>Read AI Verdict:</strong> Understand Gemini's explanation of why something is safe or phishing</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="fa-solid fa-check text-emerald-400 mt-0.5 text-[10px]"></i>
+                                        <span><strong>View Screenshots:</strong> See webpage previews without visiting dangerous sites</span>
+                                    </li>
+                                </ul>
+                                <div class="mt-3 p-2 rounded bg-emerald-500/10">
+                                    <p class="text-[10px] text-emerald-300"><i class="fa-solid fa-user mr-1"></i> You are: End user, student, or non-technical staff</p>
+                                </div>
+                            </div>
+
+                            <!-- INTERMEDIATE -->
+                            <div class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                                        <i class="fa-solid fa-layer-group text-blue-400 text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-blue-300">Step 2: Intermediate</h4>
+                                        <p class="text-[10px] text-blue-400/70">Security Analysis</p>
+                                    </div>
+                                </div>
+                                <ul class="space-y-2 text-xs text-gray-300">
+                                    <li class="flex items-start gap-2">
+                                        <i class="fa-solid fa-check text-blue-400 mt-0.5 text-[10px]"></i>
+                                        <span><strong>URL Tracing:</strong> Follow redirect chains through bit.ly, tinyurl to find real destination</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="fa-solid fa-check text-blue-400 mt-0.5 text-[10px]"></i>
+                                        <span><strong>WHOIS Lookup:</strong> Check domain age, owner, SSL certificate validity</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="fa-solid fa-check text-blue-400 mt-0.5 text-[10px]"></i>
+                                        <span><strong>Email Headers:</strong> Inspect SPF, DKIM, DMARC authentication markers</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="fa-solid fa-check text-blue-400 mt-0.5 text-[10px]"></i>
+                                        <span><strong>Sandbox View:</strong> Watch what happens when malicious URL opens</span>
+                                    </li>
+                                </ul>
+                                <div class="mt-3 p-2 rounded bg-blue-500/10">
+                                    <p class="text-[10px] text-blue-300"><i class="fa-solid fa-user mr-1"></i> You are: SOC analyst or incident responder</p>
+                                </div>
+                            </div>
+
+                            <!-- ADVANCED -->
+                            <div class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                                        <i class="fa-solid fa-rocket text-purple-400 text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-purple-300">Step 3: Advanced</h4>
+                                        <p class="text-[10px] text-purple-400/70">Threat Hunting</p>
+                                    </div>
+                                </div>
+                                <ul class="space-y-2 text-xs text-gray-300">
+                                    <li class="flex items-start gap-2">
+                                        <i class="fa-solid fa-check text-purple-400 mt-0.5 text-[10px]"></i>
+                                        <span><strong>QR Fingerprinting:</strong> Track QR codes across multiple campaigns and time periods</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="fa-solid fa-check text-purple-400 mt-0.5 text-[10px]"></i>
+                                        <span><strong>Attribution:</strong> Match attacks to known threat actors like TA-QR-002</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="fa-solid fa-check text-purple-400 mt-0.5 text-[10px]"></i>
+                                        <span><strong>Honeytokens:</strong> Deploy bait credentials and detect when attackers use them</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="fa-solid fa-check text-purple-400 mt-0.5 text-[10px]"></i>
+                                        <span><strong>SIEM Integration:</strong> Auto-push detections to Splunk with full context</span>
+                                    </li>
+                                </ul>
+                                <div class="mt-3 p-2 rounded bg-purple-500/10">
+                                    <p class="text-[10px] text-purple-300"><i class="fa-solid fa-user mr-1"></i> You are: Threat intel researcher or security engineer</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                            <p class="text-xs text-amber-300">
+                                <i class="fa-solid fa-lightbulb mr-1"></i>
+                                <strong>Pro Tip:</strong> Don't worry if you don't understand all features at once. Start with Basic (Step 1), scan a few URLs/QRs, then gradually explore more advanced features as you become comfortable.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- What is Phishing -->
+                    <div class="glass-panel p-6">
+                        <h3 class="font-semibold text-base mb-3 flex items-center gap-2"><i class="fa-solid fa-circle-question text-blue-400"></i> What is Phishing?</h3>
+                        <p class="text-sm text-gray-300 leading-relaxed">Phishing is a cyberattack where adversaries impersonate trusted entities — banks, tech companies, colleagues — to steal credentials, financial data, or install malware. It exploits human psychology rather than technical vulnerabilities, making awareness your strongest defense.</p>
+                    </div>
+
+                    <!-- Attack Types Grid -->
+                    <div>
+                        <h3 class="font-semibold text-base mb-4 flex items-center gap-2"><i class="fa-solid fa-spider text-red-400"></i> Common Attack Vectors</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="glass-panel p-4 border border-indigo-500/20 hover:border-indigo-500/50 transition-all">
+                                <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-envelope text-indigo-400"></i><span class="font-medium text-sm">Email Phishing</span></div>
+                                <p class="text-xs text-gray-400">Bulk fraudulent emails mimicking legitimate senders to harvest credentials or deliver malware via malicious links and attachments.</p>
+                                <div class="mt-3 flex flex-wrap gap-1">
+                                    <span class="text-[10px] bg-red-500/20 text-red-300 px-2 py-0.5 rounded-full">Spoofed Sender</span>
+                                    <span class="text-[10px] bg-red-500/20 text-red-300 px-2 py-0.5 rounded-full">Malicious Links</span>
+                                    <span class="text-[10px] bg-red-500/20 text-red-300 px-2 py-0.5 rounded-full">Fake Attachments</span>
+                                </div>
+                            </div>
+                            <div class="glass-panel p-4 border border-purple-500/20 hover:border-purple-500/50 transition-all">
+                                <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-mobile-screen text-purple-400"></i><span class="font-medium text-sm">Smishing (SMS)</span></div>
+                                <p class="text-xs text-gray-400">SMS-based phishing using urgent messages about package deliveries, bank alerts, or prize notifications to lure victims to fake sites.</p>
+                                <div class="mt-3 flex flex-wrap gap-1">
+                                    <span class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">Fake SMS</span>
+                                    <span class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">Urgency Tactics</span>
+                                </div>
+                            </div>
+                            <div class="glass-panel p-4 border border-yellow-500/20 hover:border-yellow-500/50 transition-all">
+                                <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-phone text-yellow-400"></i><span class="font-medium text-sm">Vishing (Voice)</span></div>
+                                <p class="text-xs text-gray-400">Phone-based social engineering where attackers impersonate banks, government agencies, or IT support to extract sensitive info.</p>
+                                <div class="mt-3 flex flex-wrap gap-1">
+                                    <span class="text-[10px] bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded-full">Caller ID Spoof</span>
+                                    <span class="text-[10px] bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded-full">Social Engineering</span>
+                                </div>
+                            </div>
+                            <div class="glass-panel p-4 border border-cyan-500/20 hover:border-cyan-500/50 transition-all">
+                                <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-qrcode text-cyan-400"></i><span class="font-medium text-sm">Quishing (QR Code)</span></div>
+                                <p class="text-xs text-gray-400">Malicious QR codes embedded in emails, flyers, or stickers that redirect victims to credential-harvesting websites.</p>
+                                <div class="mt-3 flex flex-wrap gap-1">
+                                    <span class="text-[10px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full">Fake QR</span>
+                                    <span class="text-[10px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full">URL Redirect</span>
+                                </div>
+                            </div>
+                            <div class="glass-panel p-4 border border-orange-500/20 hover:border-orange-500/50 transition-all">
+                                <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-clone text-orange-400"></i><span class="font-medium text-sm">Clone Phishing</span></div>
+                                <p class="text-xs text-gray-400">Attackers duplicate a legitimate email previously received by the target, replacing links or attachments with malicious versions.</p>
+                                <div class="mt-3 flex flex-wrap gap-1">
+                                    <span class="text-[10px] bg-orange-500/20 text-orange-300 px-2 py-0.5 rounded-full">Replicated Email</span>
+                                    <span class="text-[10px] bg-orange-500/20 text-orange-300 px-2 py-0.5 rounded-full">Swapped Payload</span>
+                                </div>
+                            </div>
+                            <div class="glass-panel p-4 border border-green-500/20 hover:border-green-500/50 transition-all">
+                                <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-users text-green-400"></i><span class="font-medium text-sm">Social Engineering</span></div>
+                                <p class="text-xs text-gray-400">Psychological manipulation — pretexting, baiting, tailgating — that bypasses technical controls by exploiting human trust.</p>
+                                <div class="mt-3 flex flex-wrap gap-1">
+                                    <span class="text-[10px] bg-green-500/20 text-green-300 px-2 py-0.5 rounded-full">Pretexting</span>
+                                    <span class="text-[10px] bg-green-500/20 text-green-300 px-2 py-0.5 rounded-full">Baiting</span>
+                                    <span class="text-[10px] bg-green-500/20 text-green-300 px-2 py-0.5 rounded-full">Impersonation</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Red Flags -->
+                    <div class="glass-panel p-6">
+                        <h3 class="font-semibold text-base mb-4 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-amber-400"></i> Red Flags to Watch</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="flex items-start gap-3 p-3 bg-white/5 rounded-lg">
+                                <i class="fa-solid fa-xmark text-red-400 mt-0.5"></i>
+                                <div>
+                                    <p class="text-sm font-medium">Urgency &amp; Pressure</p>
+                                    <p class="text-xs text-gray-400">"Your account will be suspended in 24 hours" — attackers create panic to bypass rational thinking.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3 p-3 bg-white/5 rounded-lg">
+                                <i class="fa-solid fa-xmark text-red-400 mt-0.5"></i>
+                                <div>
+                                    <p class="text-sm font-medium">Mismatched URLs</p>
+                                    <p class="text-xs text-gray-400">Hover over links before clicking — displayed text may say "paypal.com" but actually points to "paypa1-secure.ru".</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3 p-3 bg-white/5 rounded-lg">
+                                <i class="fa-solid fa-xmark text-red-400 mt-0.5"></i>
+                                <div>
+                                    <p class="text-sm font-medium">Generic Greetings</p>
+                                    <p class="text-xs text-gray-400">"Dear Customer" instead of your actual name signals a mass phishing campaign.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3 p-3 bg-white/5 rounded-lg">
+                                <i class="fa-solid fa-xmark text-red-400 mt-0.5"></i>
+                                <div>
+                                    <p class="text-sm font-medium">Unexpected Requests</p>
+                                    <p class="text-xs text-gray-400">Legitimate organizations never ask for passwords, OTPs, or credit card numbers via email or SMS.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3 p-3 bg-white/5 rounded-lg">
+                                <i class="fa-solid fa-xmark text-red-400 mt-0.5"></i>
+                                <div>
+                                    <p class="text-sm font-medium">Grammar &amp; Spelling Errors</p>
+                                    <p class="text-xs text-gray-400">Poor language quality is often a giveaway — though AI-generated phishing is increasingly polished.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3 p-3 bg-white/5 rounded-lg">
+                                <i class="fa-solid fa-xmark text-red-400 mt-0.5"></i>
+                                <div>
+                                    <p class="text-sm font-medium">Suspicious Attachments</p>
+                                    <p class="text-xs text-gray-400">Unexpected .exe, .zip, .docx with macros, or .pdf files can contain malware or exploits.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Best Practices -->
+                    <div class="glass-panel p-6">
+                        <h3 class="font-semibold text-base mb-4 flex items-center gap-2"><i class="fa-solid fa-shield-halved text-emerald-400"></i> Protection Best Practices</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="text-center p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                                <i class="fa-solid fa-key text-emerald-400 text-2xl mb-2"></i>
+                                <p class="text-sm font-medium mb-1">Enable MFA</p>
+                                <p class="text-xs text-gray-400">Multi-Factor Authentication stops attackers even if your password is stolen.</p>
+                            </div>
+                            <div class="text-center p-4 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                                <i class="fa-solid fa-magnifying-glass text-blue-400 text-2xl mb-2"></i>
+                                <p class="text-sm font-medium mb-1">Verify Senders</p>
+                                <p class="text-xs text-gray-400">Always check the actual email address, not just the display name. Contact via official channels to confirm.</p>
+                            </div>
+                            <div class="text-center p-4 bg-purple-500/10 rounded-xl border border-purple-500/20">
+                                <i class="fa-solid fa-rotate text-purple-400 text-2xl mb-2"></i>
+                                <p class="text-sm font-medium mb-1">Keep Systems Updated</p>
+                                <p class="text-xs text-gray-400">Patches close known vulnerabilities that phishing payloads exploit to gain initial access.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Report Phishing -->
+                    <div class="glass-panel p-6 border border-indigo-500/30">
+                        <h3 class="font-semibold text-base mb-3 flex items-center gap-2"><i class="fa-solid fa-flag text-indigo-400"></i> How to Report Phishing</h3>
+                        <div class="space-y-2 text-sm text-gray-300">
+                            <p><span class="text-indigo-300 font-medium">Email:</span> Forward the suspicious email to <code class="text-xs bg-white/10 px-1.5 py-0.5 rounded">reportphishing@apwg.org</code> or your organization's security team.</p>
+                            <p><span class="text-indigo-300 font-medium">Google Safe Browsing:</span> Report phishing URLs at <code class="text-xs bg-white/10 px-1.5 py-0.5 rounded">safebrowsing.google.com/safebrowsing/report_phish</code></p>
+                            <p><span class="text-indigo-300 font-medium">India CERT:</span> Report to <code class="text-xs bg-white/10 px-1.5 py-0.5 rounded">incident@cert-in.org.in</code> or via the National Cyber Crime Portal at <code class="text-xs bg-white/10 px-1.5 py-0.5 rounded">cybercrime.gov.in</code></p>
+                            <p><span class="text-indigo-300 font-medium">SMS Scams:</span> Forward suspicious texts to <code class="text-xs bg-white/10 px-1.5 py-0.5 rounded">7726 (SPAM)</code> in India or the US.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FEATURES TAB -->
+                <div id="view-features" class="hidden space-y-8 animate-fade-in">
+                    <!-- Header -->
+                    <div class="glass-panel p-6">
+                        <div class="flex items-center gap-3 mb-1">
+                            <i class="fa-solid fa-list-check text-emerald-400 text-xl"></i>
+                            <h2 class="text-xl font-bold">Platform Features</h2>
+                        </div>
+                        <p class="text-sm text-gray-400">Complete feature matrix from basic detection to advanced threat intelligence across all attack vectors.</p>
+                    </div>
+
+                    <!-- Common Features (All Vectors) -->
+                    <div class="glass-panel p-6">
+                        <h3 class="font-semibold text-base mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-blue-400"></i> 
+                            Common Features (All Vectors)
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-brain text-purple-400 text-sm"></i>
+                                    <span class="font-medium text-sm">AI Analysis</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">When you scan a URL, email, or QR code, our Gemini AI analyzes the content like a cybersecurity expert. It checks for phishing patterns, brand impersonation, urgency tactics, and malicious indicators - then provides a confidence score (0-100%) with a detailed explanation of why it's safe or dangerous.</p>
+                            </div>
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-shield-virus text-green-400 text-sm"></i>
+                                    <span class="font-medium text-sm">Risk Scoring</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Every scan gets a precise 0-100% risk score based on multiple factors: domain age, SSL certificate validity, VirusTotal detections, AI verdict, and sandbox behavior. 0-30% = Safe, 31-70% = Suspicious, 71-100% = Dangerous. This helps you quickly understand the threat level.</p>
+                            </div>
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-clock-rotate-left text-amber-400 text-sm"></i>
+                                    <span class="font-medium text-sm">History & Caching</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">When you scan something, we check if we've seen it before. If another user already scanned that URL/QR, you get instant results without waiting. All Indicators of Compromise (IOCs) - like malicious domains and file hashes - are cached for 1 hour to give you faster responses and reduce API calls.</p>
+                            </div>
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-bug text-red-400 text-sm"></i>
+                                    <span class="font-medium text-sm">Sandbox Detonation</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">For suspicious URLs, we open them in an isolated virtual browser (sandbox) and record what happens. We log: page redirects, JavaScript execution, network requests, file downloads, and credential fields. This shows you exactly what a victim would see without putting your system at risk.</p>
+                            </div>
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-file-pdf text-rose-400 text-sm"></i>
+                                    <span class="font-medium text-sm">SOC Reports</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">After every scan, you can download a professional PDF incident report with: threat summary, risk score, technical details (headers, redirects, WHOIS), visual evidence (screenshots), and recommended actions. These reports are ready to share with your security team or management.</p>
+                            </div>
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-database text-cyan-400 text-sm"></i>
+                                    <span class="font-medium text-sm">Threat Intelligence</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">We check your URLs against 90+ security vendors via VirusTotal and scan web pages via URLScan.io. If a domain is flagged as phishing, malware, or spam by any security engine, you'll know immediately. This gives you real-time threat intelligence from the global security community.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vector-Specific Features -->
+                    <div class="space-y-4">
+                        <!-- URL Features -->
+                        <div class="glass-panel p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                                    <i class="fa-solid fa-link text-blue-400"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-base">URL Phishing Detection</h3>
+                                    <p class="text-[10px] text-gray-400">Web-based phishing link analysis</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="flex items-start gap-2 p-4 rounded-lg bg-white/5">
+                                    <i class="fa-solid fa-route text-indigo-400 mt-1 text-sm"></i>
+                                    <div>
+                                        <p class="text-sm font-medium mb-1">URL Tracing & Unshortening</p>
+                                        <p class="text-xs text-gray-400 leading-relaxed">When you scan a shortened URL (bit.ly, tinyurl, t.co), we follow all the redirects to find the real destination. This reveals hidden malicious domains that attackers try to mask. You see the full redirect chain and the final landing page URL.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-2 p-4 rounded-lg bg-white/5">
+                                    <i class="fa-solid fa-eye text-teal-400 mt-1 text-sm"></i>
+                                    <div>
+                                        <p class="text-sm font-medium mb-1">Visual Analysis</p>
+                                        <p class="text-xs text-gray-400 leading-relaxed">We capture a screenshot of the webpage and our AI vision model analyzes it. It detects fake login pages, brand impersonation, suspicious forms, and visual phishing indicators. You get the actual screenshot plus AI's analysis of what makes it dangerous.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-2 p-4 rounded-lg bg-white/5">
+                                    <i class="fa-solid fa-fingerprint text-purple-400 mt-1 text-sm"></i>
+                                    <div>
+                                        <p class="text-sm font-medium mb-1">Browser Fingerprinting Detection</p>
+                                        <p class="text-xs text-gray-400 leading-relaxed">Malicious sites use Canvas fingerprinting, WebGL tracking, and Font enumeration to identify and track visitors. We detect these techniques and warn you if a site is trying to fingerprint your browser - a common technique in advanced phishing attacks.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-2 p-4 rounded-lg bg-white/5">
+                                    <i class="fa-solid fa-calendar-check text-orange-400 mt-1 text-sm"></i>
+                                    <div>
+                                        <p class="text-sm font-medium mb-1">Domain Age & SSL Analysis</p>
+                                        <p class="text-xs text-gray-400 leading-relaxed">We check WHOIS records to see when a domain was registered. Phishing domains are often less than 30 days old. We also verify SSL certificates - legitimate sites have valid certs from trusted issuers, while phishing sites often have self-signed or expired certificates.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- QR Features -->
+                        <div class="glass-panel p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                                    <i class="fa-solid fa-qrcode text-purple-400"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-base">QR Code (Quishing) Detection</h3>
+                                    <p class="text-[10px] text-gray-400">Advanced QR payload analysis & campaign tracking</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="flex items-start gap-2 p-4 rounded-lg bg-white/5">
+                                    <i class="fa-solid fa-fingerprint text-pink-400 mt-1 text-sm"></i>
+                                    <div>
+                                        <p class="text-sm font-medium mb-1">QR Fingerprinting</p>
+                                        <p class="text-xs text-gray-400 leading-relaxed">Every QR code gets a unique fingerprint based on its visual pattern and payload. If the same QR appears in different attacks, we know it's part of the same campaign. This helps track how widely a phishing attack has spread and identify related incidents.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-2 p-4 rounded-lg bg-white/5">
+                                    <i class="fa-solid fa-user-secret text-rose-400 mt-1 text-sm"></i>
+                                    <div>
+                                        <p class="text-sm font-medium mb-1">Threat Actor Attribution</p>
+                                        <p class="text-xs text-gray-400 leading-relaxed">By analyzing the QR structure, payload patterns, and target domains, we can match attacks to known threat groups. For example, if a QR uses specific typosquatting patterns and targets banking sites, it might match TA-QR-002's known TTPs (Tactics, Techniques, Procedures).</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-2 p-4 rounded-lg bg-white/5">
+                                    <i class="fa-solid fa-clock text-amber-400 mt-1 text-sm"></i>
+                                    <div>
+                                        <p class="text-sm font-medium mb-1">Temporal Analysis</p>
+                                        <p class="text-xs text-gray-400 leading-relaxed">When was this QR first seen? When did attacks peak? Are there patterns like "only active on weekdays" or "spikes during lunch hours"? This timing intelligence helps predict when the same attacker might strike again and helps security teams prepare.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-2 p-4 rounded-lg bg-white/5">
+                                    <i class="fa-solid fa-cookie-bite text-amber-400 mt-1 text-sm"></i>
+                                    <div>
+                                        <p class="text-sm font-medium mb-1">Honeytoken Injection</p>
+                                        <p class="text-xs text-gray-400 leading-relaxed">We can embed fake "bait" credentials into QR codes that lead to our controlled servers. If attackers use these credentials, we get an immediate alert - confirming the phishing campaign is active and giving us real-time intelligence on attacker behavior.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Email Features -->
+                        <div class="glass-panel p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center">
+                                    <i class="fa-solid fa-envelope text-indigo-400"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-base">Email (EML) Analysis</h3>
+                                    <p class="text-[10px] text-gray-400">Forensic email header & attachment analysis</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="flex items-start gap-2 p-4 rounded-lg bg-white/5">
+                                    <i class="fa-solid fa-file-pdf text-red-400 mt-1 text-sm"></i>
+                                    <div>
+                                        <p class="text-sm font-medium mb-1">PDF Malware Detection</p>
+                                        <p class="text-xs text-gray-400 leading-relaxed">Attackers often hide malicious JavaScript in PDF attachments that executes when opened. We scan PDFs for: embedded JavaScript, suspicious URLs, file launch actions, and obfuscated content. If a PDF tries to download malware or redirect to phishing sites, we catch it.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-2 p-4 rounded-lg bg-white/5">
+                                    <i class="fa-solid fa-link text-blue-400 mt-1 text-sm"></i>
+                                    <div>
+                                        <p class="text-sm font-medium mb-1">Deep Link Extraction</p>
+                                        <p class="text-xs text-gray-400 leading-relaxed">Emails often contain hidden links - in the body, HTML, attachments, even images. We extract every URL, then run each through our full analysis pipeline: VirusTotal checks, sandbox detonation, visual analysis, and AI threat detection. You get a complete link safety report.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-2 p-4 rounded-lg bg-white/5">
+                                    <i class="fa-solid fa-globe text-cyan-400 mt-1 text-sm"></i>
+                                    <div>
+                                        <p class="text-sm font-medium mb-1">IOC Feed Correlation</p>
+                                        <p class="text-xs text-gray-400 leading-relaxed">We check every domain, IP, and URL against multiple threat intel feeds: VirusTotal (90+ engines), URLScan.io, AbuseIPDB, and our own IOC database. If any security vendor has flagged it as malicious, phishing, or suspicious, you'll know immediately with detailed context.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-2 p-4 rounded-lg bg-white/5">
+                                    <i class="fa-solid fa-robot text-green-400 mt-1 text-sm"></i>
+                                    <div>
+                                        <p class="text-sm font-medium mb-1">Machine Learning Classification</p>
+                                        <p class="text-xs text-gray-400 leading-relaxed">Our ML model analyzes 20+ features: URL length, domain age, presence of suspicious keywords ("urgent", "verify", "suspend"), typosquatting patterns, and more. It learns from thousands of phishing vs legitimate emails to predict probability with 94%+ accuracy.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SMS Features -->
+                        <div class="glass-panel p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-xl bg-fuchsia-500/10 flex items-center justify-center">
+                                    <i class="fa-solid fa-mobile-screen text-fuchsia-400"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-base">SMS (Smishing) Detection</h3>
+                                    <p class="text-[10px] text-gray-400">Text message link analysis & shortener unmasking</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="flex items-start gap-2 p-4 rounded-lg bg-white/5">
+                                    <i class="fa-solid fa-compress text-amber-400 mt-1 text-sm"></i>
+                                    <div>
+                                        <p class="text-sm font-medium mb-1">SMS Link Unmasking</p>
+                                        <p class="text-xs text-gray-400 leading-relaxed">Smishing texts always use URL shorteners to hide malicious domains. We unmask them by following redirects through bit.ly, tinyurl, t.co, and 50+ other shorteners. You see the real destination before clicking - often a fake bank or delivery site designed to steal credentials.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-2 p-4 rounded-lg bg-white/5">
+                                    <i class="fa-solid fa-language text-indigo-400 mt-1 text-sm"></i>
+                                    <div>
+                                        <p class="text-sm font-medium mb-1">Social Engineering Detection</p>
+                                        <p class="text-xs text-gray-400 leading-relaxed">Scam SMS use psychological triggers: "Your package is stuck", "Urgent: Account will be suspended", "You've won a prize". Our AI detects these urgency patterns, impersonation attempts, and fear-based tactics. It also checks sender ID spoofing and carrier routing.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Voice Features -->
+                        <div class="glass-panel p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-xl bg-yellow-500/10 flex items-center justify-center">
+                                    <i class="fa-solid fa-phone text-yellow-400"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-base">Voice (Vishing) Detection</h3>
+                                    <p class="text-[10px] text-gray-400">Audio analysis for scam call detection</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="flex items-start gap-2 p-4 rounded-lg bg-white/5">
+                                    <i class="fa-solid fa-wave-square text-cyan-400 mt-1 text-sm"></i>
+                                    <div>
+                                        <p class="text-sm font-medium mb-1">Voice-to-Text Transcription</p>
+                                        <p class="text-xs text-gray-400 leading-relaxed">Upload a scam call recording and we'll convert speech to text using advanced AI. This lets you analyze the exact words scammers use - their scripts, pressure tactics, and impersonation techniques. You can also search for keywords and share evidence with authorities.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-2 p-4 rounded-lg bg-white/5">
+                                    <i class="fa-solid fa-brain text-purple-400 mt-1 text-sm"></i>
+                                    <div>
+                                        <p class="text-sm font-medium mb-1">Vishing Pattern Recognition</p>
+                                        <p class="text-xs text-gray-400 leading-relaxed">Our AI is trained on thousands of scam call recordings. It recognizes patterns like: "This is your bank calling", "IRS enforcement action", "Tech support refund". It detects urgency creation, authority impersonation, and callback number spoofing - giving you a risk score based on how closely the call matches known vishing scripts.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Integration & Reporting -->
+                    <div class="glass-panel p-6">
+                        <h3 class="font-semibold text-base mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-plug text-emerald-400"></i> 
+                            Integration & Reporting
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="p-4 rounded-lg bg-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-puzzle-piece text-blue-400 text-sm"></i>
+                                    <span class="font-medium text-sm">SIEM Integration</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Connect to your Security Operations Center tools - Splunk, Elastic (ELK), IBM QRadar, or any SIEM with webhook support. Every detection automatically creates an incident ticket with full IOCs, risk scores, and recommended actions. Your SOC team gets everything they need for response.</p>
+                            </div>
+                            <div class="p-4 rounded-lg bg-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-bell text-amber-400 text-sm"></i>
+                                    <span class="font-medium text-sm">Real-Time Alerts</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Get instant notifications when high-risk threats are detected. Configure alerts via Slack, Microsoft Teams, Email, or webhook. Alert rules can be customized: notify only for risk >70%, specific threat actors, or certain vectors (QR/Email/SMS). Your team responds faster to active threats.</p>
+                            </div>
+                            <div class="p-4 rounded-lg bg-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-chart-pie text-rose-400 text-sm"></i>
+                                    <span class="font-medium text-sm">Executive Reporting</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Generate executive-friendly reports showing: total threats blocked, attack trends over time, most targeted vectors, and threat actor activity. Perfect for CISO briefings and compliance audits. Reports export as PDF with your organization's branding and risk summary charts.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Intelligence Modules -->
+                    <div class="glass-panel p-6">
+                        <h3 class="font-semibold text-base mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-rocket text-purple-400"></i> 
+                            Advanced Intelligence Modules (10)
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Honeytoken Manager -->
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-cookie-bite text-amber-400 text-sm"></i>
+                                    <span class="font-medium text-sm">Honeytoken Manager</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Deploy bait credentials and fake tokens across your infrastructure. When attackers use these decoys, you get instant alerts with their IP, location, and tactics. Creates a tripwire system that detects intrusion attempts before real damage occurs.</p>
+                            </div>
+                            <!-- PDF Analyzer -->
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-file-pdf text-red-400 text-sm"></i>
+                                    <span class="font-medium text-sm">PDF Analyzer</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Deep inspection of PDF documents for malicious JavaScript, embedded URLs, suspicious metadata, and hidden objects. Detects phishing PDFs that use fake invoices, shipping notices, or bank statements to trick users.</p>
+                            </div>
+                            <!-- IOC Feed Manager -->
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-globe text-cyan-400 text-sm"></i>
+                                    <span class="font-medium text-sm">IOC Feed Manager</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Aggregates 5+ threat intelligence feeds (OpenPhish, EmergingThreats, etc.) into a local database. Every scanned URL is checked against 1,600+ known malicious IOCs with real-time updates and automatic synchronization.</p>
+                            </div>
+                            <!-- QR Fingerprinting -->
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-fingerprint text-purple-400 text-sm"></i>
+                                    <span class="font-medium text-sm">QR Fingerprinting</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Creates unique fingerprints for each QR code to track campaign distribution patterns. Identifies if multiple QR codes belong to the same phishing campaign by analyzing payload similarity, structure, and metadata patterns.</p>
+                            </div>
+                            <!-- Campaign Attribution -->
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-user-secret text-pink-400 text-sm"></i>
+                                    <span class="font-medium text-sm">Campaign Attribution</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Links attacks to known threat actor groups using TTP analysis (Tactics, Techniques, Procedures). Identifies if a phishing campaign matches profiles of APT groups, cybercrime gangs, or nation-state actors with confidence scoring.</p>
+                            </div>
+                            <!-- Browser Fingerprinting Detection -->
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-fingerprint text-teal-400 text-sm"></i>
+                                    <span class="font-medium text-sm">Browser Fingerprinting Detection</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Detects Canvas fingerprinting, WebGL tracking, and Font enumeration techniques used by malicious sites to identify and track visitors. Warns users when a site attempts to fingerprint their browser - a common technique in advanced phishing attacks.</p>
+                            </div>
+                            <!-- Temporal Analysis -->
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-clock text-orange-400 text-sm"></i>
+                                    <span class="font-medium text-sm">Temporal Analysis</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Analyzes attack timing patterns, hourly/daily distribution, and correlations with global events. Identifies if attacks spike during specific times (business hours, holidays) or correlate with major events (Breaches, geopolitical incidents).</p>
+                            </div>
+                            <!-- ML Detector -->
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-robot text-green-400 text-sm"></i>
+                                    <span class="font-medium text-sm">ML Detector</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Local machine learning model with 20+ features for offline phishing detection. Analyzes URL length, domain age, suspicious keywords, typosquatting patterns without requiring internet. Provides instant verdicts with 94%+ accuracy as backup to AI analysis.</p>
+                            </div>
+                            <!-- Integration Hub -->
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-plug text-blue-400 text-sm"></i>
+                                    <span class="font-medium text-sm">Integration Hub</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Central integration point for 3rd party tools. Provides API endpoints, webhooks, and export formats compatible with major security platforms. Enables automated workflows where detections trigger automatic responses in your security stack.</p>
+                            </div>
+                            <!-- Executive Reporting -->
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-chart-pie text-yellow-400 text-sm"></i>
+                                    <span class="font-medium text-sm">Executive Reporting</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Automated generation of CISO-level dashboards and reports. Shows risk trends, threat actor activity, attack vector distribution, and ROI metrics. Includes threat landscape summaries and predictive intelligence for strategic planning.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Capabilities -->
+                    <div class="glass-panel p-6">
+                        <h3 class="font-semibold text-base mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-microchip text-pink-400"></i> 
+                            Advanced Capabilities
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- GPU Acceleration -->
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-microchip text-green-400 text-sm"></i>
+                                    <span class="font-medium text-sm">GPU Acceleration (RTX 3050)</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">NVIDIA RTX 3050 4GB GPU acceleration for deep learning models. Enables 95x faster processing for visual analysis, audio deepfake detection, and large-scale pattern matching. Automatically falls back to CPU if GPU unavailable.</p>
+                            </div>
+                            <!-- OSINT Scanner -->
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-search text-blue-400 text-sm"></i>
+                                    <span class="font-medium text-sm">OSINT Scanner</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Open Source Intelligence gathering from dark web monitoring, breach databases, and threat actor forums. Correlates scanned payloads with leaked credentials, known attack infrastructure, and emerging threat indicators.</p>
+                            </div>
+                            <!-- Sandbox Detonator -->
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-bomb text-red-400 text-sm"></i>
+                                    <span class="font-medium text-sm">Sandbox Detonator</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Isolated virtual browser environment for safe payload analysis. Records all network requests, JavaScript execution, file downloads, and DOM changes. Provides forensic timeline of exactly what happens when a victim clicks a malicious link.</p>
+                            </div>
+                            <!-- SOAR Playbook -->
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-book-medical text-amber-400 text-sm"></i>
+                                    <span class="font-medium text-sm">SOAR Playbook</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Security Orchestration, Automation and Response playbooks. Automatically generates step-by-step incident response workflows based on threat type. Includes containment procedures, notification templates, and remediation checklists.</p>
+                            </div>
+                            <!-- Predictive Intelligence -->
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-brain text-purple-400 text-sm"></i>
+                                    <span class="font-medium text-sm">Predictive Intelligence</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Machine learning models that predict future attack trends based on current patterns. Forecasts which vectors will be targeted next, estimates risk windows, and provides proactive recommendations before attacks peak.</p>
+                            </div>
+                            <!-- Zero-Click Extractor -->
+                            <div class="p-4 rounded-lg bg-white/5 border border-white/5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fa-solid fa-fingerprint text-cyan-400 text-sm"></i>
+                                    <span class="font-medium text-sm">Zero-Click Extractor</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">Forensically-safe QR code and barcode extraction without triggering malicious actions. Sandboxed parsing prevents automatic URL opening or payload execution while extracting all embedded data, metadata, and structure.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INTEL TAB -->
+                <div id="view-intel" class="hidden space-y-8 animate-fade-in">
+                    <div class="glass-panel p-6 h-[500px] relative">
+                        <h3 class="font-semibold mb-2">Global Threat Infrastructure</h3>
+                        <p class="text-xs text-gray-500 mb-4">Real-time visualization of threat actors and infrastructure</p>
+                        <div id="threat-graph" class="absolute inset-6 top-20"></div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/3d-force-graph"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}?v={{ v }}"></script>
+</body>
+</html>
